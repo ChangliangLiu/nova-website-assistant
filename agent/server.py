@@ -28,6 +28,7 @@ from pipecat.transports.smallwebrtc.transport import SmallWebRTCTransport
 from pipecat.workers.runner import WorkerRunner
 from website_search import WebsiteSearch, website_instructions
 from cloudflare_search import CloudflareSearch
+from video_throttle import VIDEO_FPS, VIDEO_SIZE, VideoThrottle
 
 BASE = Path(__file__).resolve().parent.parent
 load_dotenv(BASE / '.env')
@@ -137,7 +138,7 @@ async def run_pipeline(transport, website, page_url, *, phone=False):
             await self.push_frame(frame, direction)
     processors = [transport.input(), TypedInputBridge(), user, llm]
     if avatar:
-        processors.append(avatar)
+        processors.extend([avatar, VideoThrottle()])
     processors += [transport.output(), assistant]
     worker = PipelineWorker(Pipeline(processors), idle_timeout_secs=120, enable_rtvi=not phone)
     runner = WorkerRunner(handle_sigint=False)
@@ -172,7 +173,8 @@ async def offer(request: Request):
     async def connected(connection):
         transport = SmallWebRTCTransport(webrtc_connection=connection, params=TransportParams(
             audio_in_enabled=True, audio_out_enabled=True, video_out_enabled=True,
-            video_out_is_live=True, video_out_width=512, video_out_height=512))
+            video_out_is_live=True, video_out_width=VIDEO_SIZE, video_out_height=VIDEO_SIZE,
+            video_out_framerate=VIDEO_FPS))
         task = asyncio.create_task(run_pipeline(transport, website, page))
         tasks.add(task)
         task.add_done_callback(tasks.discard)
