@@ -1,0 +1,7 @@
+# Deploy separately so browser sessions and phone calls remain independent.
+agent_name = "nova-website-assistant-phone"
+secret_set = "nova-website-assistant-secrets"
+region = "us-west"
+[scaling]
+min_agents = 0
+max_agents = 1

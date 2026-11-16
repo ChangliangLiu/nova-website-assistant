@@ -1,0 +1,403 @@
+{
+  "alpine": {
+    "version": 1,
+    "siteId": "alpine",
+    "suggestions": [
+      "Which skis are good for beginners?",
+      "What is the return policy?",
+      "How do I choose ski boots?"
+    ],
+    "name": "Alpine Outfitters",
+    "origin": "https://alpine-outfitters-demo.pages.dev",
+    "description": "Fictional ski equipment shop. All products, prices, policies and specifications are demo content. No real orders. No live mountain conditions.",
+    "updatedAt": "2026-11-03",
+    "documents": [
+      {
+        "id": "product-summit-88",
+        "title": "Summit 88 · Skis",
+        "url": "https://alpine-outfitters-demo.pages.dev/products/summit-88/",
+        "tags": [
+          "summit-88",
+          "summit 88",
+          "skis",
+          "all-mountain",
+          "intermediate"
+        ],
+        "content": "Summit 88: $549 USD. Category: Skis. Your first chair to last lap ski. A versatile 88 mm waist and approachable flex make the Summit 88 at home on groomers and a little fresh snow. Sizes: 158 cm, 166 cm, 174 cm, 182 cm. Specifications: Waist width: 88 mm; Turn radius: 16 m at 174 cm; Construction: Poplar wood core, carbon stringers; Bindings: Sold separately. Who it is for: Intermediate resort skiers who split their day between groomed runs and softer snow at the edges of the piste. The Summit 88 costs $549 per pair, without bindings.\nHow it feels: Tip rocker helps the ski initiate turns; camber underfoot supports edge grip on prepared snow. It favors controlled, medium-radius turns rather than high-speed racing.\nFit and setup: Choose length with a qualified shop based on height, weight and ability. Have a technician select compatible alpine bindings, mount them and set release values. Never set release values from an online chart alone."
+      },
+      {
+        "id": "product-drift-104",
+        "title": "Drift 104 · Skis",
+        "url": "https://alpine-outfitters-demo.pages.dev/products/drift-104/",
+        "tags": [
+          "drift-104",
+          "drift 104",
+          "skis",
+          "soft snow",
+          "advanced"
+        ],
+        "content": "Drift 104: $699 USD. Category: Skis. A wider platform for storm-day resort laps. The Drift 104 brings a playful shape to soft snow, with enough support for the ride back to the lift. Sizes: 172 cm, 180 cm, 188 cm. Specifications: Waist width: 104 mm; Turn radius: 19 m at 180 cm; Construction: Paulownia / poplar core; Bindings: Sold separately. Who it is for: Advanced skiers seeking a soft-snow resort ski. At $699 per pair, bindings are sold separately. It is wider and less quick edge to edge than the Summit 88.\nShape and feel: Rocker at the tip and tail helps the ski release through soft snow. The 104 mm waist prioritizes float over the firm-snow precision of a narrower piste ski.\nMountain boundaries: This is not avalanche safety equipment. Off-piste and backcountry travel require local knowledge, training, forecasts and appropriate partners and equipment."
+      },
+      {
+        "id": "product-piste-76",
+        "title": "Piste 76 · Skis",
+        "url": "https://alpine-outfitters-demo.pages.dev/products/piste-76/",
+        "tags": [
+          "piste-76",
+          "piste 76",
+          "skis",
+          "groomed runs",
+          "beginner"
+        ],
+        "content": "Piste 76: $399 USD. Category: Skis. A forgiving, easy-turning ski for learning the rhythm of the mountain. Built for green runs, lessons, and the joy of getting a little better every day. Sizes: 146 cm, 154 cm, 162 cm, 170 cm. Specifications: Waist width: 76 mm; Turn radius: 13 m at 162 cm; Construction: Composite / wood core; Bindings: Sold separately. Who it is for: Beginner and early intermediate skiers on groomed runs. The Piste 76 costs $399 per pair without bindings. Its 76 mm waist and forgiving flex make it our first-ski recommendation.\nLearning progression: Pair this ski with an in-person lesson. Practice speed control and stopping on gentle terrain before progressing. A narrower ski helps edge changes but cannot replace technique.\nSizing: Available in 146, 154, 162 and 170 cm. Shorter lengths are often easier to turn, but a professional should account for height, weight and ability."
+      },
+      {
+        "id": "product-ridge-100-boots",
+        "title": "Ridge 100 · Boots",
+        "url": "https://alpine-outfitters-demo.pages.dev/products/ridge-100-boots/",
+        "tags": [
+          "ridge-100-boots",
+          "ridge 100",
+          "boots",
+          "all-mountain",
+          "intermediate"
+        ],
+        "content": "Ridge 100: $349 USD. Category: Boots. Supportive resort boots with a balanced flex and a warm, moldable liner. Start with the right fit, then make the mountain your own. Sizes: 24.5, 25.5, 26.5, 27.5, 28.5. Specifications: Flex index: 100 (brand-specific); Last: 100 mm at 26.5; Sole: GripWalk; Closure: Four buckles + power strap. Fit comes first: The Ridge 100 costs $349. It has a 100 mm last at size 26.5 and a brand-specific 100 flex. These figures do not guarantee fit: visit a qualified boot fitter for a shell check.\nCompatibility: GripWalk soles require bindings explicitly compatible with GripWalk. Do not assume an older alpine binding is compatible. A technician must inspect the complete system.\nReturns: Indoor try-on is allowed if the boots remain clean with all packaging. Heat-molded or modified boots cannot be returned under our demo policy unless defective."
+      },
+      {
+        "id": "product-vista-goggles",
+        "title": "Vista Goggles · Accessories",
+        "url": "https://alpine-outfitters-demo.pages.dev/products/vista-goggles/",
+        "tags": [
+          "vista-goggles",
+          "vista goggles",
+          "accessories",
+          "resort",
+          "all levels"
+        ],
+        "content": "Vista Goggles: $119 USD. Category: Accessories. Two lenses, changing skies, one clear outlook. A sunny lens and a low-light lens are included so you can adapt to the day. Sizes: Standard fit. Specifications: Included lenses: Sunny lens + low-light lens; Lens system: Magnetic interchange; Fit: Medium; helmet compatible; Care: Air dry; dab inside lens. In the box: Vista Goggles cost $119 and include one sunny lens, one low-light lens, a soft pouch and a protective case. Fit is medium; check compatibility with your helmet.\nLens choice: Use the sunny lens in bright conditions and the low-light lens in flat light. Never use goggles to look directly at the sun.\nCare: Let wet goggles air dry. Avoid wiping the inside of a wet lens because this can damage the anti-fog coating. Use the pouch for transport."
+      },
+      {
+        "id": "product-crest-helmet",
+        "title": "Crest Helmet · Accessories",
+        "url": "https://alpine-outfitters-demo.pages.dev/products/crest-helmet/",
+        "tags": [
+          "crest-helmet",
+          "crest helmet",
+          "accessories",
+          "resort",
+          "all levels"
+        ],
+        "content": "Crest Helmet: $139 USD. Category: Accessories. A low-profile resort helmet with adjustable vents and a dial fit system. Comfortable enough for the first lift and the last descent. Sizes: S · 52–55 cm, M · 55–59 cm, L · 59–62 cm. Specifications: Construction: In-mold shell; Adjustment: Rear fit dial; Ventilation: Adjustable vents; Weight: 420 g in medium (demo specification). Fit check: The Crest Helmet costs $139. Measure around your head above the eyebrows. It should sit level and snug without painful pressure and remain stable with the chin strap fastened.\nProtection limits: This is a fictional demo product, with no real certification or safety claim. On a real store, verify the exact model’s certified standards with the manufacturer before purchasing. No helmet prevents all injuries.\nReplacement: Replace a real helmet after a significant impact or according to manufacturer guidance. Do not buy a used helmet with an unknown history."
+      },
+      {
+        "id": "product-traverse-poles",
+        "title": "Traverse Poles · Accessories",
+        "url": "https://alpine-outfitters-demo.pages.dev/products/traverse-poles/",
+        "tags": [
+          "traverse-poles",
+          "traverse poles",
+          "accessories",
+          "resort",
+          "all levels"
+        ],
+        "content": "Traverse Poles: $69 USD. Category: Accessories. Dependable aluminum poles with comfortable grips. A simple companion for lift lines, traverses and developing a confident pole plant. Sizes: 105 cm, 110 cm, 115 cm, 120 cm, 125 cm. Specifications: Shaft: Aluminum; Grip: Ergonomic rubber; Basket: Resort basket; Sold as: Pair. Details: Traverse Poles cost $69 per pair and are available in 105, 110, 115, 120 and 125 cm. They use an aluminum shaft and fixed resort baskets.\nSizing: Ask a shop to check length while you wear ski boots. A roughly right-angle elbow when holding the inverted pole below the basket is a starting point, not a universal fit rule.\nSafe use: Follow your instructor’s guidance for strap use and lift loading. Release straps where entanglement is a concern."
+      },
+      {
+        "id": "product-merino-layers",
+        "title": "Merino Base Layer · Apparel",
+        "url": "https://alpine-outfitters-demo.pages.dev/products/merino-layers/",
+        "tags": [
+          "merino-layers",
+          "merino base layer",
+          "apparel",
+          "cold weather",
+          "all levels"
+        ],
+        "content": "Merino Base Layer: $89 USD. Category: Apparel. A soft merino-blend crew for comfortable days outside. Breathable next-to-skin warmth, from the parking lot to the summit. Sizes: XS, S, M, L, XL. Specifications: Fabric: 80% merino / 20% nylon; Weight: 200 g/m²; Fit: Next to skin; Care: Cold gentle wash; lay flat to dry. Details: The Merino Base Layer costs $89. Fabric is an 80% merino and 20% nylon blend at 200 g/m², available in XS through XL.\nLayering: Wear next to skin beneath an insulating midlayer and weatherproof shell. Adjust layers before overheating; damp clothing can chill you on the lift.\nCare: Machine wash cold on a gentle cycle with wool-safe detergent. Lay flat to dry. Avoid bleach, fabric softener and tumble drying."
+      },
+      {
+        "id": "choosing-your-skis",
+        "title": "Find your kind of ski",
+        "url": "https://alpine-outfitters-demo.pages.dev/guides/choosing-your-skis/",
+        "tags": [
+          "choose",
+          "recommend",
+          "beginner",
+          "intermediate",
+          "ski",
+          "compare"
+        ],
+        "content": "A practical starting point for matching your skis to the way you ride.\nStart with terrain: For mostly groomed runs and early lessons, consider the Piste 76 ($399). For intermediate resort skiing on groomers and occasional softer snow, consider the Summit 88 ($549). For advanced soft-snow resort skiing, consider the Drift 104 ($699). All prices are demo USD per pair; bindings are separate.\nWidth and length: Waist width influences how a ski changes edges and supports you in soft snow. Length depends on height, weight, ability and preference. Visit a ski shop for a complete fit rather than relying only on a height chart.\nA complete setup: Budget for boots, compatible bindings, professional mounting and release testing. Check helmet and goggle fit together. An in-person lesson usually does more for a beginner than a more demanding ski."
+      },
+      {
+        "id": "boot-fit",
+        "title": "A better boot fit",
+        "url": "https://alpine-outfitters-demo.pages.dev/guides/boot-fit/",
+        "tags": [
+          "boots",
+          "fit",
+          "size",
+          "mondo",
+          "ridge"
+        ],
+        "content": "Why the right fit matters more than a flex number.\nMeasure both feet: Ski boots use Mondopoint sizing based on foot length in centimeters. Measure both feet and have a boot fitter check shell length, width, volume and stance. Street-shoe conversion charts are a rough starting point.\nWhat to feel: A properly fitted boot should hold the heel securely without sharp pain or numbness. Toes may touch lightly when upright and ease back as you flex. Do not buy an oversized boot to solve a pressure point.\nOur resort boot: Ridge 100 costs $349, has a 100 mm last at 26.5, a brand-specific flex of 100 and GripWalk soles. Bindings must explicitly support GripWalk. Try indoors before any heat molding."
+      },
+      {
+        "id": "ski-sizing",
+        "title": "Ski length, explained",
+        "url": "https://alpine-outfitters-demo.pages.dev/guides/ski-sizing/",
+        "tags": [
+          "length",
+          "height",
+          "weight",
+          "sizing",
+          "size"
+        ],
+        "content": "Height is a starting point. Your skiing tells the rest of the story.\nThere is no universal size: A shorter ski generally feels easier to turn; a longer ski can provide more stability and soft-snow support. Weight, skill, rocker and intended terrain all change the decision.\nCatalog lengths: Piste 76: 146, 154, 162, 170 cm. Summit 88: 158, 166, 174, 182 cm. Drift 104: 172, 180, 188 cm. These are available demo sizes, not a personal fitting prescription.\nGet a fitting: Bring your height, weight, ability and typical terrain to a qualified shop. Demo a length when possible. Have bindings professionally mounted and tested."
+      },
+      {
+        "id": "binding-compatibility",
+        "title": "Bindings & compatibility",
+        "url": "https://alpine-outfitters-demo.pages.dev/guides/binding-compatibility/",
+        "tags": [
+          "binding",
+          "bindings",
+          "gripwalk",
+          "din",
+          "mounting"
+        ],
+        "content": "Build a complete system, with a technician’s help.\nCheck the entire system: The demo skis are sold without bindings. The Ridge 100 uses GripWalk soles, which need a binding marked compatible with GripWalk. Brake width must fit the ski; mounting pattern and boot sole length also matter.\nProfessional setup: Have a qualified ski technician mount bindings, inspect the system and perform release testing. Release settings depend on multiple individual factors and equipment condition. We do not provide a personal DIN setting through chat.\nPolicy effect: Mounted skis count as modified equipment and are not eligible for a change-of-mind return under the demo policy. Defective equipment is handled separately."
+      },
+      {
+        "id": "goggle-lenses",
+        "title": "See clearly in changing light",
+        "url": "https://alpine-outfitters-demo.pages.dev/guides/goggle-lenses/",
+        "tags": [
+          "goggle",
+          "goggles",
+          "lens",
+          "lenses",
+          "fog",
+          "vista"
+        ],
+        "content": "Pick a lens for the conditions, and look after it.\nTwo lenses: Vista Goggles ($119) include a sunny lens and a low-light lens. Change lenses in a dry sheltered area. Check the lens is fully seated before skiing.\nReduce fogging: Keep vents clear of snow. Avoid putting damp goggles on your forehead. Air dry after use, and dab rather than rub the inside of a wet lens.\nHelmet pairing: Try goggles with your helmet to check fit, airflow and field of view. Helmet compatibility is not a guarantee of fit for every combination."
+      },
+      {
+        "id": "layering",
+        "title": "Dress for a day outside",
+        "url": "https://alpine-outfitters-demo.pages.dev/guides/layering/",
+        "tags": [
+          "layer",
+          "layers",
+          "clothing",
+          "merino",
+          "apparel",
+          "warm"
+        ],
+        "content": "Three adaptable layers for changing mountain weather.\nBase layer: Choose a moisture-managing layer next to skin. Our demo Merino Base Layer ($89) blends 80% merino with 20% nylon. Avoid relying on cotton in cold, wet conditions.\nInsulate and protect: Add an insulating midlayer and a shell that protects against wind and precipitation. Carry an extra layer and adjust clothing before getting sweaty or chilled.\nHands and feet: Use dry ski socks, gloves and weather-appropriate coverage. Avoid cramming multiple thick socks into fitted boots. Retreat indoors if you cannot stay warm."
+      },
+      {
+        "id": "returns",
+        "title": "Returns & refunds",
+        "url": "https://alpine-outfitters-demo.pages.dev/guides/returns/",
+        "tags": [
+          "refund",
+          "return",
+          "returns",
+          "cancel",
+          "exchange",
+          "policy",
+          "damaged"
+        ],
+        "content": "The details before you buy. Clear, straightforward, and all in one place.\n30-day return window: This demo policy accepts unused, unmodified gear within 30 days of delivery, with original packaging and proof of purchase. Clean indoor boot try-on is allowed. Contact the demo support form to request a return authorization before sending gear.\nExceptions: Mounted skis, heat-molded boots and other modified items cannot be returned for a change of mind. Final-sale items are excluded. Defective or incorrectly supplied goods are reviewed separately; contact support with photos and order details.\nRefund timing and costs: After inspection and acceptance, the demo policy issues a refund to the original payment method within 5–10 business days. Original shipping is nonrefundable, except for a verified defect or our fulfillment error. Customers pay return shipping for change-of-mind returns. Exchanges use a return and a new order. No real purchases or refunds are processed on this demo site."
+      },
+      {
+        "id": "shipping",
+        "title": "Shipping & delivery",
+        "url": "https://alpine-outfitters-demo.pages.dev/guides/shipping/",
+        "tags": [
+          "shipping",
+          "delivery",
+          "ship",
+          "cost",
+          "free"
+        ],
+        "content": "Plan ahead for your next mountain day.\nWhere we ship: The fictional store ships within the contiguous United States only. It does not support Alaska, Hawaii or international delivery in this demo.\nCosts and timing: Standard shipping is free for demo merchandise orders of $100 or more before tax; below $100 it is $12. Orders take 1–2 business days to process, followed by an estimated 3–7 business days in transit. No expedited delivery is offered.\nMountain weather: Weather can delay transport. These are sample policy estimates, not a delivery guarantee. No real orders are fulfilled on this website."
+      },
+      {
+        "id": "warranty",
+        "title": "Warranty & product care",
+        "url": "https://alpine-outfitters-demo.pages.dev/guides/warranty/",
+        "tags": [
+          "warranty",
+          "defect",
+          "broken",
+          "repair"
+        ],
+        "content": "What the demo warranty covers, and how to keep gear going.\nDemo coverage: The fictional Alpine Outfitters warranty covers manufacturing defects for one year from the demo purchase date for the original purchaser, with proof of purchase. Wear, impact damage, misuse, neglect and unauthorized modifications are excluded.\nStarting a claim: Use the support form with product name, order reference, photos and a description of the issue. The demo process reviews repair or replacement eligibility; it does not promise automatic replacement.\nKeep equipment safe: Follow the manufacturer’s care instructions for real equipment. Have bindings inspected by a technician and replace damaged protective equipment according to manufacturer guidance."
+      },
+      {
+        "id": "privacy",
+        "title": "Your privacy on this demo",
+        "url": "https://alpine-outfitters-demo.pages.dev/guides/privacy/",
+        "tags": [
+          "privacy",
+          "record",
+          "recording",
+          "data",
+          "microphone"
+        ],
+        "content": "What happens when you browse or speak with Nova.\nBrowsing and bag: The demo shopping bag is stored in your browser’s local storage. There is no payment processor and no real order database. Clearing browser data removes the bag.\nTalking with Nova: Typing a source question sends it to the assistant server. Starting a live avatar session requests microphone access and uses a real-time media service, Zoom Voice Agent and Simli. Microphone audio is sent to Zoom through the configured media service; generated speech is sent to Simli.\nConversation handling: The application does not record audio. The widget holds transcript text in memory for the current page session. Third-party provider policies apply to their processing. Reloading a page resets the conversation."
+      },
+      {
+        "id": "first-day",
+        "title": "Your first day on skis",
+        "url": "https://alpine-outfitters-demo.pages.dev/guides/first-day/",
+        "tags": [
+          "first",
+          "beginner",
+          "learn",
+          "lesson",
+          "fundamentals"
+        ],
+        "content": "A calm, practical start for the mountain.\nBook a lesson: Start with a qualified instructor and a designated learning area. Arrive early for rental or fitting checks. Tell the instructor about prior experience and any relevant limitations.\nPractice the basics: Learn how to carry equipment, click in, stand in an athletic stance and stop. Practice controlled turns on gentle slopes before trying steeper terrain. This written guide is an orientation, not a substitute for instruction.\nPlan a comfortable day: Bring warm layers, waterproof gloves, eye protection, sunscreen, water and snacks. Take breaks and finish before fatigue makes control difficult."
+      },
+      {
+        "id": "turning-and-stopping",
+        "title": "Turning & controlling speed",
+        "url": "https://alpine-outfitters-demo.pages.dev/guides/turning-and-stopping/",
+        "tags": [
+          "turn",
+          "turning",
+          "stop",
+          "stopping",
+          "snowplow",
+          "pizza",
+          "speed"
+        ],
+        "content": "Build control on gentle terrain with an instructor.\nControl first: Work with an instructor to learn a stable stance and controlled stopping. Choose terrain where you can stop safely and maintain control throughout each turn.\nTurn shape: Rounded turns across the slope can help manage speed. Look ahead, allow space for others and avoid abrupt traverses into traffic. Do not progress to steeper terrain until your instructor considers you ready.\nWhen to stop skiing: If you cannot control your speed or stop reliably, return to easier terrain and ask for help. Fatigue, poor visibility and icy conditions can change what terrain is appropriate."
+      },
+      {
+        "id": "mountain-etiquette",
+        "title": "Share the mountain well",
+        "url": "https://alpine-outfitters-demo.pages.dev/guides/mountain-etiquette/",
+        "tags": [
+          "etiquette",
+          "right of way",
+          "rules",
+          "safety",
+          "responsibility"
+        ],
+        "content": "A few habits that make the slopes better for everyone.\nGive others space: Stay in control and avoid people and objects. People downhill generally have priority. Look uphill before starting or merging, and stop where you are visible from above and do not block a trail.\nRespect signs: Follow posted signs, closures and resort staff directions. Know how to load, ride and unload lifts safely. If unsure, ask the lift attendant before approaching.\nLocal rules apply: Resort codes and local laws govern your visit. Read the current resort guidance and follow patrol instructions. This is a general introduction, not a complete legal or safety code."
+      },
+      {
+        "id": "trail-ratings",
+        "title": "Trail signs & choosing terrain",
+        "url": "https://alpine-outfitters-demo.pages.dev/guides/trail-ratings/",
+        "tags": [
+          "green",
+          "blue",
+          "black",
+          "trail",
+          "rating",
+          "difficulty"
+        ],
+        "content": "Choose a run for today’s ability and conditions.\nRead the local map: In many North American resorts, green circles indicate easier terrain, blue squares more difficult terrain, and black diamonds advanced terrain. Ratings are relative within a resort and are not directly comparable between mountains.\nConditions matter: Weather, snow surface, grooming and visibility can make the same run feel very different. Ask an instructor or patrol if you are unsure about a route.\nStay within boundaries: A trail rating does not indicate avalanche safety. Respect closures, ropes and area boundaries. Leave backcountry decisions to appropriately trained and equipped groups with current local forecasts."
+      },
+      {
+        "id": "ski-care",
+        "title": "Care between mountain days",
+        "url": "https://alpine-outfitters-demo.pages.dev/guides/ski-care/",
+        "tags": [
+          "wax",
+          "care",
+          "storage",
+          "edges",
+          "maintain",
+          "maintenance"
+        ],
+        "content": "A little attention makes the next day easier.\nAfter skiing: Wipe skis dry and remove snow around bindings without forcing mechanisms. Let boots and liners dry with gentle airflow; avoid direct high heat. Air dry goggles.\nService: Have bases and edges checked by a shop as needed for wear and conditions. Waxing needs vary with snow and use. Have a professional inspect damaged edges and binding issues before skiing.\nOff-season: Store equipment dry, away from direct heat and sunlight. Follow the actual manufacturer’s storage guidance. Do not change binding settings without a technician."
+      },
+      {
+        "id": "trip-checklist",
+        "title": "The mountain day checklist",
+        "url": "https://alpine-outfitters-demo.pages.dev/guides/trip-checklist/",
+        "tags": [
+          "pack",
+          "checklist",
+          "trip",
+          "bring",
+          "packing"
+        ],
+        "content": "Pack once. Enjoy the day.\nEquipment: Skis, compatible bindings, fitted boots, poles, helmet and goggles. Check everything before leaving home and book professional service if necessary.\nClothing and comfort: Base layers, midlayer, shell, ski socks, waterproof gloves, neck covering and an extra warm layer. Bring water, snacks, sunscreen and a charged phone.\nBefore the drive: Check official weather, road and resort reports. Confirm tickets, lesson meeting point and rental reservations directly with providers. This demo does not report live conditions or availability."
+      },
+      {
+        "id": "mountain-whistler",
+        "title": "Mountain notes: Whistler Blackcomb",
+        "url": "https://alpine-outfitters-demo.pages.dev/guides/mountain-whistler/",
+        "tags": [
+          "whistler",
+          "blackcomb",
+          "canada",
+          "mountain"
+        ],
+        "content": "A general introduction to a large British Columbia mountain destination.\nThe setting: Whistler Blackcomb is a mountain resort destination in British Columbia, Canada. Its two-mountain setting offers a broad variety of terrain. This is a general destination introduction, not a live trail or snow report.\nA first visit: Plan around your group’s ability and book instruction directly with a provider if needed. Mountain weather and visibility can vary across elevations. Leave time to learn the map and return routes.\nCheck before traveling: For current lift status, snow conditions, ticket prices, operating dates and travel requirements, consult the official resort website. Nova cannot verify live conditions from this static guide."
+      },
+      {
+        "id": "mountain-palisades",
+        "title": "Mountain notes: Palisades Tahoe",
+        "url": "https://alpine-outfitters-demo.pages.dev/guides/mountain-palisades/",
+        "tags": [
+          "palisades",
+          "tahoe",
+          "california",
+          "mountain"
+        ],
+        "content": "A Lake Tahoe introduction for planning your research.\nThe setting: Palisades Tahoe is a ski destination in California’s Lake Tahoe region, with Olympic Valley and Alpine Meadows areas. Terrain and conditions vary, so choose routes appropriate to your ability.\nA first visit: Plan transport and access ahead, especially during storms and busy weekends. Take time to understand the local map and ask resort staff for suitable beginner or intermediate areas.\nCheck before traveling: Use the official resort and road authority websites for current operations, parking requirements, road restrictions, snow conditions and pricing. This website has no live mountain feed."
+      },
+      {
+        "id": "mountain-chamonix",
+        "title": "Mountain notes: Chamonix",
+        "url": "https://alpine-outfitters-demo.pages.dev/guides/mountain-chamonix/",
+        "tags": [
+          "chamonix",
+          "france",
+          "alps",
+          "mountain"
+        ],
+        "content": "A French Alpine setting with terrain that deserves respect.\nThe setting: Chamonix is a French Alpine valley near Mont Blanc, with multiple ski areas. The destination is associated with dramatic terrain and mountaineering as well as resort skiing.\nChoose the right experience: For a first visit, choose an area suited to your ability and consider local instruction. Glaciated and off-piste terrain requires specialized skills and qualified local guidance; it is not a beginner extension of marked resort runs.\nCheck before traveling: Confirm lift operations, snow, access, prices and weather with official local providers. These notes do not offer route guidance, current conditions or avalanche assessment."
+      },
+      {
+        "id": "mountain-niseko",
+        "title": "Mountain notes: Niseko",
+        "url": "https://alpine-outfitters-demo.pages.dev/guides/mountain-niseko/",
+        "tags": [
+          "niseko",
+          "japan",
+          "hokkaido",
+          "mountain",
+          "powder"
+        ],
+        "content": "An introduction to Hokkaido mountain days.\nThe setting: Niseko is a ski destination in Hokkaido, Japan, known for its winter mountain setting and several connected resort areas. Weather and visibility can change quickly.\nA first visit: Choose terrain for your actual ability and consider a local instructor to understand the resort layout. Follow local rules, boundary signage and staff instructions.\nCheck before traveling: Use official sources for operating dates, snow reports, lift tickets, transport and gate rules. This static guide cannot establish whether fresh snow or any particular terrain will be available."
+      },
+      {
+        "id": "about",
+        "title": "A good day starts with good gear",
+        "url": "https://alpine-outfitters-demo.pages.dev/guides/about/",
+        "tags": [
+          "about",
+          "alpine",
+          "store",
+          "demo"
+        ],
+        "content": "Thoughtful equipment. Practical advice. More time outside.\nOur approach: Alpine Outfitters is a fictional ski shop built to demonstrate an independent website and a reusable avatar assistant. All products, prices and shop policies are illustrative.\nA little guidance: The field guide brings product details, policy explanations, ski fundamentals and mountain introductions together. Nova can find relevant sources and, with a live connection, discuss them through a talking avatar.\nTry the full experience: Browse a product, add a size to your demo bag, read a field guide, and ask Nova what fits your plans. The checkout never takes payment or creates a real order."
+      }
+    ],
+    "allowedOrigins": [
+      "https://alpine-outfitters-demo.pages.dev",
+      "http://127.0.0.1:8000",
+      "http://localhost:8000"
+    ]
+  }
+}

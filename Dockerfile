@@ -1,0 +1,8 @@
+FROM dailyco/pipecat-base:latest
+ENV SETUPTOOLS_SCM_PRETEND_VERSION_FOR_PIPECAT_AI=1.15.0.dev0
+COPY requirements-cloud.txt requirements-cloud.txt
+RUN pip install --no-cache-dir -r requirements-cloud.txt
+RUN python -c "from pipecat_resampler import Resampler; assert len(Resampler(24000, 16000).process(bytes(960))) > 0"
+COPY bot.py bot.py
+COPY agent agent
+COPY web web

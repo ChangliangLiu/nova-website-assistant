@@ -1,0 +1,6 @@
+agent_name = "nova-website-assistant"
+secret_set = "nova-website-assistant-secrets"
+region = "us-west"
+[scaling]
+min_agents = 0
+max_agents = 1

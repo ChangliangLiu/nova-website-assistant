@@ -1,0 +1,5 @@
+pipecat-ai[webrtc-video,simli,runner,cli] @ git+https://github.com/pipecat-ai/pipecat.git@3dbb0c8445c0ddc2276d566140fe8d12f1d61e5b
+pipecat-resampler==0.1.1
+simli-ai==2.1.1
+pytest>=8,<10
+httpx>=0.27,<1
