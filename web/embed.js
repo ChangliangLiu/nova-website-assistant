@@ -1,7 +1,7 @@
 import {PipecatClient} from '@pipecat-ai/client-js';
 import {SmallWebRTCTransport} from '@pipecat-ai/small-webrtc-transport';
 import {DailyTransport} from '@pipecat-ai/daily-transport';
-import {connectClient} from './connection.js';
+import {connectClient, createDailyTransport} from './connection.js';
 const $ = id => document.getElementById(id);
 const params = new URLSearchParams(location.search);
 const site = params.get('site') || '', parentOrigin = params.get('parentOrigin') || '';
@@ -23,7 +23,7 @@ async function connect(){
  if(connected){const c=client;reset();await c?.disconnect();return;}
  connecting=true;error('');$('phone').hidden=true;$('connect').disabled=false;$('connect').textContent='End conversation';$('status').textContent='Connecting…';
  const cloud=globalThis.NOVA_CLOUD === true;
- const current=new PipecatClient({transport:cloud?new DailyTransport():new SmallWebRTCTransport({iceServers:[{urls:'stun:stun.l.google.com:19302'}]}),enableMic:true,enableCam:false,callbacks:{
+ const current=new PipecatClient({transport:cloud?createDailyTransport(DailyTransport):new SmallWebRTCTransport({iceServers:[{urls:'stun:stun.l.google.com:19302'}]}),enableMic:true,enableCam:false,callbacks:{
   onTrackStarted(track,participant){if(participant?.local)return;if(track.kind==='video'){$('avatar').srcObject=new MediaStream([track]);$('avatar').classList.remove('ne-hidden');$('preview').hidden=true}else if(track.kind==='audio'){$('audio').srcObject=new MediaStream([track]);$('audio').play().catch(()=>error('Your browser blocked audio playback.'))}},
   onDisconnected(){if(client===current)reset()},
   onError(e){error(e?.data?.error||e?.data?.message||'The live connection needs attention.')},

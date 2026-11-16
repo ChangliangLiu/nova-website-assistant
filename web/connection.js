@@ -1,3 +1,12 @@
+// Ask the browser to reduce speaker feedback and background noise. These are
+// preferences: unsupported devices may ignore them, and headphones are still
+// the most reliable way to prevent echo-triggered interruptions.
+export function createDailyTransport(DailyTransport) {
+  return new DailyTransport({
+    inputSettings: {audio: {settings: {echoCancellation: true, noiseSuppression: true}}}
+  });
+}
+
 // Initialize the microphone before creating a billable cloud session. If the
 // user cancels while a permission prompt is open, discard late results.
 export async function connectClient(current, {cloud, requestData, isCurrent, timeoutMs = 45000}) {

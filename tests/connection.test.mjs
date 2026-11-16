@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {connectClient} from '../web/connection.js';
+import {connectClient, createDailyTransport} from '../web/connection.js';
 
 test('microphone initializes before the cloud session starts', async () => {
   const calls = [];
@@ -32,4 +32,13 @@ test('a cancelled permission prompt cannot start a later cloud session', async (
 test('a permission prompt that never finishes times out', async () => {
   const client = {initDevices: () => new Promise(() => {})};
   await assert.rejects(connectClient(client, {cloud: true, requestData: {}, isCurrent: () => true, timeoutMs: 10}), /timed out/);
+});
+
+// The recording path should request browser echo processing without preventing
+// people from interrupting the assistant or changing microphone devices.
+test('cloud microphone requests echo cancellation and noise suppression', () => {
+  class FakeDailyTransport { constructor(options) { this.options = options; } }
+  const transport = createDailyTransport(FakeDailyTransport);
+  assert.equal(transport.options.inputSettings.audio.settings.echoCancellation, true);
+  assert.equal(transport.options.inputSettings.audio.settings.noiseSuppression, true);
 });
