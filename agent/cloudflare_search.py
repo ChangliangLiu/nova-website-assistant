@@ -8,7 +8,8 @@ import httpx
 class CloudflareSearch:
     def __init__(self, website, *, client=None):
         self.website = website
-        self.client = client
+        self.client = client or httpx.AsyncClient(follow_redirects=False)
+        self._owns_client = client is None
         self.account = os.getenv('CF_ACCOUNT_ID', '')
         self.token = os.getenv('CF_AI_SEARCH_TOKEN', '')
         self.namespace = os.getenv('CF_AI_SEARCH_NAMESPACE', 'default')
@@ -31,11 +32,7 @@ class CloudflareSearch:
             if body.get('success') is not True or not isinstance(body.get('result', {}).get('chunks'), list):
                 raise ValueError('Invalid Cloudflare search response')
             return body['result']['chunks']
-        if self.client:
-            chunks = await request(self.client)
-        else:
-            async with httpx.AsyncClient(follow_redirects=False) as client:
-                chunks = await request(client)
+        chunks = await request(self.client)
         passages, sources = [], []
         for chunk in chunks[:8]:
             if not isinstance(chunk, dict) or not isinstance(chunk.get('text'), str):
@@ -56,5 +53,13 @@ class CloudflareSearch:
                                 'excerpt': p['content'][:240], 'citationId': p['citationId']})
         return {'provider': 'cloudflare', 'siteId': self.website.get('siteId'), 'passages': passages, 'sources': sources}
 
+    async def warm_connection(self):
+        # Establish DNS and TLS while the avatar connects, without submitting a query.
+        try:
+            await self.client.head('https://api.cloudflare.com/client/v4', timeout=3.0)
+        except httpx.HTTPError:
+            pass
+
     async def aclose(self):
-        pass
+        if self._owns_client:
+            await self.client.aclose()

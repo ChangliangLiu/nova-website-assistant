@@ -99,7 +99,7 @@ The feed has a site ID, name, origin, descriptions and published documents. Impo
 
 ## 5. Deploy the Python agent to Pipecat Cloud
 
-Edit `pcc-deploy.toml` and choose your own unique `agent_name`, `secret_set`, region and scaling. The sample names belong to a demo: do not reuse them. Set `min_agents` to zero to reduce idle usage, understanding that a cold start can take longer. With your virtual environment active, upload the `.env` provider settings to the named secret set and build/deploy the agent:
+Edit `pcc-deploy.toml` and choose your own unique `agent_name`, `secret_set`, region and scaling. The sample names belong to a demo: do not reuse them. The demo keeps two `agent-3x` instances warm to reduce connection delays; they incur charges even when idle. Choose a smaller profile or set `min_agents` to zero to reduce idle usage, understanding that a cold start can take longer. With your virtual environment active, upload the `.env` provider settings to the named secret set and build/deploy the agent:
 
 ```sh
 pipecat cloud secrets set YOUR_SECRET_SET --file .env --region YOUR_REGION

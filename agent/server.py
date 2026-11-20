@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
-from pipecat.frames.frames import LLMRunFrame, LLMMessagesAppendFrame
+from pipecat.frames.frames import LLMRunFrame, LLMMessagesAppendFrame, TranscriptionFrame
 from pipecat.pipeline.pipeline import Pipeline
 from pipecat.pipeline.worker import PipelineWorker
 from pipecat.processors.aggregators.llm_context import LLMContext
@@ -29,6 +29,7 @@ from pipecat.workers.runner import WorkerRunner
 from website_search import WebsiteSearch, website_instructions
 from cloudflare_search import CloudflareSearch
 from video_throttle import VIDEO_FPS, VIDEO_SIZE, VideoThrottle
+from speculative_search import SpeculativeSearch
 
 BASE = Path(__file__).resolve().parent.parent
 load_dotenv(BASE / '.env')
@@ -84,12 +85,15 @@ async def search_endpoint(request: Request):
     same_origin(request)
     data = await request.json()
     site = get_site(data.get('site', ''), data.get('parentOrigin', ''))
+    search = make_search(site)
     try:
-        return await make_search(site).search(data.get('query', ''))
+        return await search.search(data.get('query', ''))
     except ValueError as error:
         raise HTTPException(400, str(error)) from error
     except httpx.HTTPError as error:
         raise HTTPException(503, 'Knowledge search is temporarily unavailable.') from error
+    finally:
+        await search.aclose()
 
 
 def make_search(website):
@@ -100,6 +104,7 @@ def make_search(website):
 
 async def run_pipeline(transport, website, page_url, *, phone=False):
     search = make_search(website)
+    speculative_search = SpeculativeSearch(search)
     worker = None
 
     async def search_website(params: FunctionCallParams, query: str):
@@ -109,12 +114,20 @@ async def run_pipeline(transport, website, page_url, *, phone=False):
             query: The visitor's question or search terms.
         """
         try:
-            result = await search.search(query)
-            if not phone:
-                await worker.rtvi.send_server_message({'type': 'sources', 'sources': result['sources']})
-            await params.result_callback(result)
+            result = await speculative_search.resolve(query)
         except Exception:
             await params.result_callback({'error': 'Website search is unavailable.'})
+            return
+
+        async def publish_sources():
+            if not phone:
+                try:
+                    await worker.rtvi.send_server_message({'type': 'sources', 'sources': result['sources']})
+                except Exception:
+                    # A UI delivery failure should not prevent the spoken answer.
+                    pass
+
+        await asyncio.gather(params.result_callback({'passages': result['passages']}), publish_sources())
 
     llm = ZoomAIRealtimeLLMService(api_key=os.environ['ZOOM_AI_API_KEY'],
         settings=ZoomAIRealtimeLLMService.Settings(
@@ -130,13 +143,20 @@ async def run_pipeline(transport, website, page_url, *, phone=False):
             if isinstance(frame, LLMMessagesAppendFrame) and direction == FrameDirection.DOWNSTREAM:
                 for entry in frame.messages:
                     if entry.get('role') == 'user' and isinstance(entry.get('content'), str):
+                        speculative_search.start(entry['content'])
                         await llm._send_message_item(entry['content'], role='user')
                         context.add_message(entry)
                 if frame.run_llm:
                     await llm._create_response()
                 return
             await self.push_frame(frame, direction)
-    processors = [transport.input(), TypedInputBridge(), user, llm]
+    class TranscriptPrefetch(FrameProcessor):
+        async def process_frame(self, frame, direction):
+            await super().process_frame(frame, direction)
+            if isinstance(frame, TranscriptionFrame) and direction == FrameDirection.UPSTREAM:
+                speculative_search.start(frame.text)
+            await self.push_frame(frame, direction)
+    processors = [transport.input(), TypedInputBridge(), user, TranscriptPrefetch(), llm]
     if avatar:
         processors.extend([avatar, VideoThrottle()])
     processors += [transport.output(), assistant]
@@ -157,6 +177,8 @@ async def run_pipeline(transport, website, page_url, *, phone=False):
             await runner.run()
     except TimeoutError:
         await runner.cancel()
+    finally:
+        await speculative_search.aclose()
 
 
 @app.post('/api/offer')
