@@ -2,11 +2,19 @@ import {PipecatClient} from '@pipecat-ai/client-js';
 import {SmallWebRTCTransport} from '@pipecat-ai/small-webrtc-transport';
 import {DailyTransport} from '@pipecat-ai/daily-transport';
 import {connectClient} from './connection.js';
+import {SessionPreparation} from './preconnect.js';
 const $ = id => document.getElementById(id);
 const params = new URLSearchParams(location.search);
 const site = params.get('site') || '', parentOrigin = params.get('parentOrigin') || '';
-let pageUrl = '', client = null, connected = false, config = null, connecting = false;
+let pageUrl = '', client = null, connected = false, config = null, connecting = false, panelOpen = false;
 let botMessage = null;
+const preparation = new SessionPreparation(async (data, signal) => {
+ const response = await fetch('/api/widget/session', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data),signal});
+ if(!response.ok)return null;
+ const connection=await response.json();
+ return connection.dailyRoom && connection.dailyToken ? connection : null;
+});
+function maybePrepare(){if(panelOpen && config?.preconnect && config.ready && globalThis.NOVA_CLOUD===true && !connected && !connecting)preparation.start({site,parentOrigin,pageUrl})}
 const post = (type, extra={}) => { if(parentOrigin) parent.postMessage({channel:'avatar-assistant',type,...extra}, parentOrigin); };
 function error(message) { $('error').hidden=!message; $('error').textContent=message || ''; }
 function message(role,text,sources=[]) {
@@ -33,7 +41,7 @@ async function connect(){
   onServerMessage(data){if(data?.type==='sources' && data.sources?.length)message('source','Website sources',data.sources)}
  }});
  client=current;
- try{await connectClient(current,{cloud,requestData:{site,parentOrigin,pageUrl},isCurrent:()=>client===current});if(client!==current)return;connected=true;connecting=false;$('connect').disabled=false;$('connect').textContent='End conversation';$('status').textContent='Live avatar';$('footer').textContent='Microphone on · sent to Zoom';post('microphone',{enabled:true})}
+ try{await connectClient(current,{cloud,requestData:{site,parentOrigin,pageUrl},prepared:cloud?preparation.take():null,isCurrent:()=>client===current});if(client!==current)return;connected=true;connecting=false;$('connect').disabled=false;$('connect').textContent='End conversation';$('status').textContent='Live avatar';$('footer').textContent='Microphone on · sent to Zoom';post('microphone',{enabled:true})}
  catch(e){if(client===current){reset();void current.disconnect().catch(()=>{});error(e?.message||'Could not connect to the avatar.')}}
 }
 async function ask(text){text=text.trim();if(!text)return;error('');$('query').value='';message('user',text);
@@ -41,6 +49,6 @@ async function ask(text){text=text.trim();if(!text)return;error('');$('query').v
  catch(e){error(e.message||'Could not send your question.')}
 }
 $('connect').onclick=()=>void connect();$('minimize').onclick=()=>post('close');$('form').onsubmit=e=>{e.preventDefault();void ask($('query').value)};
-window.addEventListener('message',e=>{if(e.source!==parent||e.origin!==parentOrigin||e.data?.channel!=='avatar-assistant')return;if(e.data.type==='context'&&typeof e.data.url==='string')pageUrl=e.data.url;if(e.data.type==='ask'&&typeof e.data.text==='string')void ask(e.data.text.slice(0,2000));if(e.data.type==='destroy'){const c=client;reset();void c?.disconnect().catch(()=>{})}});
-fetch('/api/widget/config?'+new URLSearchParams({site,parentOrigin})).then(async r=>{const d=await r.json();if(!r.ok)throw Error(d.detail||'Site unavailable');config=d;if(/^\+[1-9]\d{7,14}$/.test(d.phoneNumber||'')){$('phone').href='tel:'+d.phoneNumber;$('phone').textContent='Call '+d.phoneNumber;$('phone').hidden=false}else{config.phoneNumber=null}$('site-name').textContent=d.name;$('footer').textContent=d.documentCount ? `${d.documentCount} source pages` : 'Knowledge sources connected';$('connect').disabled=!d.ready;for(const p of d.prompts){const b=document.createElement('button');b.textContent=p+' ↗';b.onclick=()=>void ask(p);$('prompts').append(b)}}).catch(e=>{error(e.message);$('connect').disabled=true});
+window.addEventListener('message',e=>{if(e.source!==parent||e.origin!==parentOrigin||e.data?.channel!=='avatar-assistant')return;if(e.data.type==='context'&&typeof e.data.url==='string'){panelOpen=true;pageUrl=e.data.url;maybePrepare()}if(e.data.type==='minimized'){panelOpen=false;preparation.cancel()}if(e.data.type==='ask'&&typeof e.data.text==='string')void ask(e.data.text.slice(0,2000));if(e.data.type==='destroy'){panelOpen=false;preparation.cancel();const c=client;reset();void c?.disconnect().catch(()=>{})}});
+fetch('/api/widget/config?'+new URLSearchParams({site,parentOrigin})).then(async r=>{const d=await r.json();if(!r.ok)throw Error(d.detail||'Site unavailable');config=d;if(/^\+[1-9]\d{7,14}$/.test(d.phoneNumber||'')){$('phone').href='tel:'+d.phoneNumber;$('phone').textContent='Call '+d.phoneNumber;$('phone').hidden=false}else{config.phoneNumber=null}$('site-name').textContent=d.name;$('footer').textContent=d.documentCount ? `${d.documentCount} source pages` : 'Knowledge sources connected';$('connect').disabled=!d.ready;for(const p of d.prompts){const b=document.createElement('button');b.textContent=p+' ↗';b.onclick=()=>void ask(p);$('prompts').append(b)}maybePrepare()}).catch(e=>{error(e.message);$('connect').disabled=true});
 post('ready');

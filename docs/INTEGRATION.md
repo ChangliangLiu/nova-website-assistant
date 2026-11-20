@@ -97,6 +97,10 @@ node scripts/import-site.mjs ../alpine-outfitters-demo/dist/assistant-content.js
 
 The feed has a site ID, name, origin, descriptions and published documents. Import accepts 1–100 documents, each up to 15,000 characters, and a feed up to 180,000 characters. Document URLs must use the feed's origin. Allowed embedding origins must be exact HTTPS origins (HTTP is allowed on localhost). Importing a feed updates the checked-in `agent/knowledge/sites.json` locally; do not commit private content. This small snapshot does not crawl or automatically update.
 
+The Alpine example sets `preconnect: true` in its site entry. When a visitor opens the widget, this prepares a short-lived cloud session so the avatar can connect sooner. Microphone access still begins only when the visitor presses Connect. An unused preparation expires after 20 seconds and the agent stops an unclaimed session after 25 seconds; prepared sessions can incur provider charges. Omit the field or set it to `false` to start a cloud session only after the visitor presses Connect.
+
+To reduce search latency, a final spoken transcript may be sent to the configured search provider before the voice agent decides whether to search. A result is reused only when its meaningful terms match the agent's search query; context-dependent follow-ups get their own search.
+
 ## 5. Deploy the Python agent to Pipecat Cloud
 
 Edit `pcc-deploy.toml` and choose your own unique `agent_name`, `secret_set`, region and scaling. The sample names belong to a demo: do not reuse them. The demo keeps two `agent-3x` instances warm to reduce connection delays; they incur charges even when idle. Choose a smaller profile or set `min_agents` to zero to reduce idle usage, understanding that a cold start can take longer. With your virtual environment active, upload the `.env` provider settings to the named secret set and build/deploy the agent:

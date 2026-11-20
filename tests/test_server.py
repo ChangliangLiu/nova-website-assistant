@@ -1,5 +1,7 @@
 import sys
+import asyncio
 from pathlib import Path
+from unittest.mock import AsyncMock
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'agent'))
 from fastapi.testclient import TestClient
 import server
@@ -35,3 +37,18 @@ def test_missing_keys_fail_before_offer(monkeypatch):
         monkeypatch.delenv(name, raising=False)
     response = client.post('/api/offer', headers={'origin':'http://testserver'}, json={'sdp':'x','type':'offer','requestData':SITE})
     assert response.status_code == 503
+
+
+def test_unclaimed_session_stops_without_stopping_a_connected_visitor():
+    async def run():
+        class Runner:
+            cancel = AsyncMock()
+        runner = Runner()
+        await server.stop_unclaimed_session(runner, asyncio.Event(), timeout=0.001)
+        runner.cancel.assert_awaited_once()
+        runner.cancel.reset_mock()
+        connected = asyncio.Event()
+        connected.set()
+        await server.stop_unclaimed_session(runner, connected, timeout=0.001)
+        runner.cancel.assert_not_awaited()
+    asyncio.run(run())

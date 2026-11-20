@@ -33,3 +33,33 @@ test('a permission prompt that never finishes times out', async () => {
   const client = {initDevices: () => new Promise(() => {})};
   await assert.rejects(connectClient(client, {cloud: true, requestData: {}, isCurrent: () => true, timeoutMs: 10}), /timed out/);
 });
+
+test('connect uses a prepared session only after microphone initialization', async () => {
+  const calls = [];
+  const client = {
+    async initDevices() { calls.push('devices'); },
+    async startBot() { throw Error('should reuse prepared session'); },
+    async connect(params) { assert.deepEqual(params, {dailyRoom:'room', dailyToken:'token'}); calls.push('connect'); },
+    async disconnect() { calls.push('disconnect'); }
+  };
+  await connectClient(client, {cloud:true, requestData:{}, isCurrent:()=>true,
+    prepared:Promise.resolve({dailyRoom:'room', dailyToken:'token'})});
+  assert.deepEqual(calls, ['devices', 'connect']);
+});
+
+test('a failed preparation falls back to the normal session start', async () => {
+  let starts = 0;
+  const client = {async initDevices(){}, async startBot(){starts++;return {room:'fallback'}},
+    async connect(params){assert.equal(params.room,'fallback')}, async disconnect(){}};
+  await connectClient(client, {cloud:true, requestData:{}, isCurrent:()=>true, prepared:Promise.resolve(null)});
+  assert.equal(starts, 1);
+});
+
+test('cancelling during microphone permission never joins a prepared session', async () => {
+  let finish, active = true, connects = 0, disconnects = 0;
+  const client = {initDevices:()=>new Promise(resolve=>{finish=resolve}), async connect(){connects++},
+    async disconnect(){disconnects++}};
+  const pending=connectClient(client,{cloud:true,requestData:{},isCurrent:()=>active,prepared:Promise.resolve({room:'test'})});
+  active=false; finish(); await pending;
+  assert.equal(connects,0); assert.equal(disconnects,1);
+});

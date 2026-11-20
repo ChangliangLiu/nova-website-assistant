@@ -3,7 +3,8 @@ const url='https://nova-website-assistant.example';const site={site:'alpine',par
 const env={ASSETS:{fetch:async()=>new Response('asset')},PCC_API_KEY:'test',SESSION_IP_LIMITER:{limit:async()=>({success:true})},SESSION_TOTAL_LIMITER:{limit:async()=>({success:true})}};
 const post=(body,origin=url)=>new Request(url+'/api/widget/session',{method:'POST',headers:{origin,'cf-connecting-ip':'192.0.2.1'},body:JSON.stringify(body)});
 test('registered site configuration and origin validation',async()=>{
- assert.equal((await handle(new Request(url+'/api/widget/config?'+new URLSearchParams(site)),env)).status,200);
+ const config=await handle(new Request(url+'/api/widget/config?'+new URLSearchParams(site)),env);
+ assert.equal(config.status,200);assert.equal((await config.json()).preconnect,true);
  assert.equal((await handle(post(site,'https://evil.example'),env)).status,403);
  assert.equal((await handle(post({...site,parentOrigin:'https://evil.example'}),env)).status,403);
 });

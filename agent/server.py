@@ -102,6 +102,13 @@ def make_search(website):
     return WebsiteSearch(website)
 
 
+async def stop_unclaimed_session(runner, visitor_connected, timeout=25):
+    try:
+        await asyncio.wait_for(visitor_connected.wait(), timeout=timeout)
+    except TimeoutError:
+        await runner.cancel()
+
+
 async def run_pipeline(transport, website, page_url, *, phone=False):
     search = make_search(website)
     speculative_search = SpeculativeSearch(search)
@@ -163,21 +170,27 @@ async def run_pipeline(transport, website, page_url, *, phone=False):
     worker = PipelineWorker(Pipeline(processors), idle_timeout_secs=120, enable_rtvi=not phone)
     runner = WorkerRunner(handle_sigint=False)
     await runner.add_workers(worker)
+    visitor_connected = asyncio.Event()
 
     @transport.event_handler('on_client_connected')
     async def connected(transport, client):
+        visitor_connected.set()
         await worker.queue_frames([LLMRunFrame()])
 
     @transport.event_handler('on_client_disconnected')
     async def disconnected(transport, client):
         await runner.cancel()
 
+    unclaimed = asyncio.create_task(stop_unclaimed_session(runner, visitor_connected)) if not phone else None
     try:
         async with asyncio.timeout(600):
             await runner.run()
     except TimeoutError:
         await runner.cancel()
     finally:
+        if unclaimed:
+            unclaimed.cancel()
+            await asyncio.gather(unclaimed, return_exceptions=True)
         await speculative_search.aclose()
 
 

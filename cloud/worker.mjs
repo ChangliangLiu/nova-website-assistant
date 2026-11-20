@@ -15,7 +15,7 @@ export async function handle(request,env){
  if(u.pathname==='/api/widget/config' && request.method==='GET'){
   const s=siteFor(u.searchParams.get('site'),u.searchParams.get('parentOrigin'));if(!s)return json({detail:'Website not registered.'},403);
   const phoneNumber=env.PHONE_SITE_ID===s.siteId&&/^\+[1-9]\d{7,14}$/.test(env.PHONE_NUMBER||'')?env.PHONE_NUMBER:null;
-  return json({name:s.name,documentCount:s.documents.length,ready:!!env.PCC_API_KEY,prompts:s.suggestions||[],phoneNumber});
+  return json({name:s.name,documentCount:s.documents.length,ready:!!env.PCC_API_KEY,prompts:s.suggestions||[],phoneNumber,preconnect:s.preconnect===true});
  }
  if(!['/api/widget/session','/api/widget/search'].includes(u.pathname)||request.method!=='POST')return env.ASSETS.fetch(request);
  if(request.headers.get('origin')!==u.origin)return json({detail:'Invalid origin'},403);

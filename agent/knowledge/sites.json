@@ -2,6 +2,7 @@
   "alpine": {
     "version": 1,
     "siteId": "alpine",
+    "preconnect": true,
     "suggestions": [
       "Which skis are good for beginners?",
       "What is the return policy?",

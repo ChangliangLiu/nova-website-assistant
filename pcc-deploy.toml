@@ -5,4 +5,4 @@ region = "us-west"
 agent_profile = "agent-3x"
 [scaling]
 min_agents = 2
-max_agents = 5
+max_agents = 20
