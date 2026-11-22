@@ -12,7 +12,7 @@ flowchart LR
     Widget <-->|Audio and avatar video| Daily[Daily WebRTC]
     Daily <--> Agent
     Agent <-->|Speech and tool calls| Zoom[Zoom Voice Agent API]
-    Agent <-->|Relevant passages| Search[Website snapshot or Cloudflare AI Search]
+    Agent <-->|Relevant passages| Search[Website snapshot, Onyx, or Cloudflare AI Search]
     Agent <-->|Audio and avatar video| Simli[Simli]
 ```
 
@@ -22,7 +22,7 @@ Locally, the widget connects to the Python agent directly over SmallWebRTC; Pipe
 
 1. Clone this repository and the [Alpine demo](https://github.com/ChangliangLiu/alpine-outfitters-demo).
 2. Read the [setup and deployment guide](docs/INTEGRATION.md), including the architecture and credential sections.
-3. Create accounts and credentials for Zoom Voice Agent, Simli, Cloudflare and Pipecat Cloud. Cloudflare AI Search is optional; the initial demo uses a local snapshot of the website.
+3. Create accounts and credentials for Zoom Voice Agent, Simli, Cloudflare and Pipecat Cloud. Onyx and Cloudflare AI Search are optional; the initial demo uses a local snapshot of the website.
 4. Build the website, import its content feed, and run and test both projects locally.
 5. Deploy the Python agent to Pipecat Cloud, the widget gateway to Cloudflare Workers, and the website to Cloudflare Pages.
 
@@ -37,7 +37,7 @@ See the [complete guide](docs/INTEGRATION.md) for the exact commands, the accoun
 
 - `agent/server.py` builds the Pipecat voice and avatar pipeline and local server.
 - `agent/prompts/` holds the spoken conversation instructions.
-- `agent/website_search.py` searches the imported website snapshot; `agent/cloudflare_search.py` supports indexed documents and pages.
+- `agent/website_search.py` searches the imported website snapshot; `agent/onyx_search.py` and `agent/cloudflare_search.py` support indexed documents and pages.
 - `bot.py` runs the agent on Pipecat Cloud; `cloud/worker.mjs` serves the widget and starts sessions.
 - `web/` contains the framework-independent widget and iframe. `scripts/import-site.mjs` imports the website's content feed.
 

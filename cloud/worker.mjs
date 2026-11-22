@@ -1,6 +1,7 @@
 import sites from '../agent/knowledge/sites.json' with { type: 'json' };
 import {searchSite} from './site-knowledge.mjs';
 import {searchCloudflare} from './cloudflare-search.mjs';
+import {searchOnyx} from './onyx-search.mjs';
 const json=(body,status=200)=>Response.json(body,{status,headers:{'Cache-Control':'no-store'}});
 function siteFor(id,origin){const s=Object.hasOwn(sites,id)?sites[id]:null;return s?.allowedOrigins?.includes(origin)?s:null}
 export async function handle(request,env){
@@ -21,7 +22,7 @@ export async function handle(request,env){
  if(request.headers.get('origin')!==u.origin)return json({detail:'Invalid origin'},403);
  let body;try{const raw=await request.text();if(raw.length>10000)return json({detail:'Request too large'},413);body=JSON.parse(raw)}catch{return json({detail:'Invalid request'},400)}
  const s=siteFor(body?.site,body?.parentOrigin);if(!s)return json({detail:'Website not registered.'},403);
- if(u.pathname.endsWith('/search')){try{return json(await (env.NOVA_SEARCH_PROVIDER==='cloudflare'?searchCloudflare(body.query,s,env):searchSite(body.query,s)))}catch{return json({detail:'Search unavailable or invalid query.'},503)}}
+ if(u.pathname.endsWith('/search')){try{return json(await (env.NOVA_SEARCH_PROVIDER==='onyx'?searchOnyx(body.query,s,env):env.NOVA_SEARCH_PROVIDER==='cloudflare'?searchCloudflare(body.query,s,env):searchSite(body.query,s)))}catch{return json({detail:'Search unavailable or invalid query.'},503)}}
  if(!env.PCC_API_KEY||!env.SESSION_IP_LIMITER||!env.SESSION_TOTAL_LIMITER)return json({detail:'Conversation service unavailable.'},503);
  const ip=request.headers.get('cf-connecting-ip');if(!ip)return json({detail:'Conversation service unavailable.'},503);
  const [a,b]=await Promise.all([env.SESSION_IP_LIMITER.limit({key:ip}),env.SESSION_TOTAL_LIMITER.limit({key:'sessions'})]);if(!a.success||!b.success)return json({detail:'Too many conversations. Try again shortly.'},429);

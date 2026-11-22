@@ -28,6 +28,7 @@ from pipecat.transports.smallwebrtc.transport import SmallWebRTCTransport
 from pipecat.workers.runner import WorkerRunner
 from website_search import WebsiteSearch, website_instructions
 from cloudflare_search import CloudflareSearch
+from onyx_search import OnyxSearch
 from video_throttle import VIDEO_FPS, VIDEO_SIZE, VideoThrottle
 from speculative_search import SpeculativeSearch
 
@@ -97,6 +98,8 @@ async def search_endpoint(request: Request):
 
 
 def make_search(website):
+    if os.getenv('NOVA_SEARCH_PROVIDER') == 'onyx':
+        return OnyxSearch(website)
     if os.getenv('NOVA_SEARCH_PROVIDER') == 'cloudflare':
         return CloudflareSearch(website)
     return WebsiteSearch(website)

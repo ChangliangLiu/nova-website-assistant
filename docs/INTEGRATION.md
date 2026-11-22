@@ -189,6 +189,21 @@ Cloudflare can automatically crawl a website only when its domain is onboarded t
 
 The command reads the site's sitemap and local HTML, uploads each page's main content and source URL, and leaves other uploaded documents intact. Cloudflare indexes uploads asynchronously. Re-run the command after each website deployment; it updates the same page items but does not automatically remove pages deleted from the sitemap. If you later connect a custom domain to Cloudflare, you can use [Cloudflare's automatic website crawler](https://developers.cloudflare.com/ai-search/configuration/data-source/website/) instead.
 
+### Optional: Onyx search
+
+Onyx can index website content and uploaded documents, including content from supported connected sources. Create an Onyx account or self-host Onyx, connect your public website and documents, and group the content the assistant may share into a dedicated document set. Check that its indexing has completed. The assistant sends visitor questions to Onyx, and this search endpoint records them in the service account's search history. Final spoken transcripts may be searched before the voice agent decides whether it needs a search.
+
+Create an Onyx API key with access to the document set. The key's permissions can be broader than the document-set filter, so grant it only the access appropriate for your deployment and keep it on the server. Every document in the selected set must be appropriate for public visitors. See [Onyx connectors](https://docs.onyx.app/overview/core_features/connectors) and the [Onyx API reference](https://cloud.onyx.app/api/docs).
+
+```dotenv
+NOVA_SEARCH_PROVIDER=onyx
+ONYX_URL=https://cloud.onyx.app
+ONYX_DOCUMENT_SET=your-public-document-set
+ONYX_API_KEY=your-api-key
+```
+
+Set these values in the agent `.env` for local use. For cloud use, add `NOVA_SEARCH_PROVIDER`, `ONYX_URL`, and `ONYX_DOCUMENT_SET` to the Worker's nonsecret `vars` in `cloud/wrangler.json`, and upload the key as `ONYX_API_KEY` with `npx wrangler secret put ONYX_API_KEY --config cloud/wrangler.json`. Upload the same settings to the Pipecat secret set, then redeploy the agent and Worker. The application requires a configured document set and fails closed if Onyx is unavailable. It uses Onyx's fast search endpoint with query expansion disabled, and never accepts a document-set override from a visitor.
+
 ## 8. Troubleshooting
 
 | Symptom | What to check |

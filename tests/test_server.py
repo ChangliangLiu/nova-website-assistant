@@ -32,6 +32,14 @@ def test_search_provider_selection(monkeypatch):
     monkeypatch.setenv('NOVA_SEARCH_PROVIDER', 'cloudflare')
     assert isinstance(server.make_search(website), server.CloudflareSearch)
 
+
+def test_onyx_provider_selection(monkeypatch):
+    monkeypatch.setenv('NOVA_SEARCH_PROVIDER', 'onyx')
+    website = server.get_site('alpine', 'http://localhost:8000')
+    search = server.make_search(website)
+    assert isinstance(search, server.OnyxSearch)
+    asyncio.run(search.aclose())
+
 def test_missing_keys_fail_before_offer(monkeypatch):
     for name in ('ZOOM_AI_API_KEY', 'SIMLI_API_KEY', 'SIMLI_FACE_ID'):
         monkeypatch.delenv(name, raising=False)

@@ -50,3 +50,22 @@ test('widget search uses Cloudflare when configured',async()=>{
   const result=await response.json();assert.equal(result.provider,'cloudflare');assert.equal(result.passages[0].content,'Cloudflare guide');
  }finally{globalThis.fetch=original}
 });
+
+test('Onyx search enforces the configured document set and preserves safe sources',async()=>{
+ const original=globalThis.fetch;let body;
+ globalThis.fetch=async(url,opts)=>{assert.equal(url.pathname,'/api/search/send-search-message');body=JSON.parse(opts.body);return Response.json({search_docs:[{semantic_identifier:'Returns',content:'Return within 30 days.',link:'https://shop.example/returns'},{semantic_identifier:'Bad',content:'Example',link:'javascript:alert(1)'}],error:null})};
+ try{
+  const request=new Request(url+'/api/widget/search',{method:'POST',headers:{origin:url},body:JSON.stringify({...site,query:'return policy',document_set:'private'})});
+  const response=await handle(request,{...env,NOVA_SEARCH_PROVIDER:'onyx',ONYX_API_KEY:'private-token',ONYX_DOCUMENT_SET:'Alpine Public'});
+  assert.equal(response.status,200);const result=await response.json();
+  assert.deepEqual(body.filters,{document_set:['Alpine Public']});assert.equal(result.provider,'onyx');
+  assert.equal(result.sources[0].url,'https://shop.example/returns');assert.equal(result.passages[1].url,'');
+  assert.equal(JSON.stringify(result).includes('private-token'),false);
+ }finally{globalThis.fetch=original}
+});
+
+test('Onyx search fails closed without a configured document set',async()=>{
+ const request=new Request(url+'/api/widget/search',{method:'POST',headers:{origin:url},body:JSON.stringify({...site,query:'return policy'})});
+ const response=await handle(request,{...env,NOVA_SEARCH_PROVIDER:'onyx',ONYX_API_KEY:'private-token'});
+ assert.equal(response.status,503);
+});
