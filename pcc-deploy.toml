@@ -1,5 +1,5 @@
 agent_name = "nova-website-assistant"
-secret_set = "nova-website-assistant-secrets"
+secret_set = "nova-website-assistant-onyx"
 region = "us-west"
 # This demo prioritizes latency over idle cost; adjust for your own deployment.
 agent_profile = "agent-3x"
