@@ -28,7 +28,7 @@ def phone_site():
     site_id = os.environ.get('PHONE_SITE_ID', '')
     sites = json.loads((BASE / 'agent/knowledge/sites.json').read_text())
     site = sites.get(site_id)
-    if not site or not site.get('documents'):
+    if not site or site.get('siteId') != site_id:
         raise ValueError('A registered PHONE_SITE_ID is required for phone calls.')
     return site
 

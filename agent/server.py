@@ -26,8 +26,7 @@ from pipecat.transports.smallwebrtc.connection import IceServer
 from pipecat.transports.smallwebrtc.request_handler import SmallWebRTCRequest, SmallWebRTCRequestHandler
 from pipecat.transports.smallwebrtc.transport import SmallWebRTCTransport
 from pipecat.workers.runner import WorkerRunner
-from website_search import WebsiteSearch, website_instructions
-from cloudflare_search import CloudflareSearch
+from website_search import website_instructions
 from onyx_search import OnyxSearch
 from video_throttle import VIDEO_FPS, VIDEO_SIZE, VideoThrottle
 from speculative_search import SpeculativeSearch
@@ -77,7 +76,7 @@ async def embed(site: str, parentOrigin: str):
 @app.get('/api/widget/config')
 async def config(site: str, parentOrigin: str):
     website = get_site(site, parentOrigin)
-    return {'name': website['name'], 'documentCount': len(website['documents']),
+    return {'name': website['name'],
             'ready': bool(os.getenv('ZOOM_AI_API_KEY') and os.getenv('SIMLI_API_KEY') and os.getenv('SIMLI_FACE_ID')),
             'prompts': website.get('suggestions', [])}
 
@@ -87,6 +86,8 @@ async def search_endpoint(request: Request):
     same_origin(request)
     data = await request.json()
     site = get_site(data.get('site', ''), data.get('parentOrigin', ''))
+    if not os.getenv('ONYX_API_KEY') or not os.getenv('ONYX_DOCUMENT_SET', '').strip():
+        raise HTTPException(503, 'Knowledge search is not configured.')
     search = make_search(site)
     try:
         return await search.search(data.get('query', ''))
@@ -99,11 +100,7 @@ async def search_endpoint(request: Request):
 
 
 def make_search(website):
-    if os.getenv('NOVA_SEARCH_PROVIDER') == 'onyx':
-        return OnyxSearch(website)
-    if os.getenv('NOVA_SEARCH_PROVIDER') == 'cloudflare':
-        return CloudflareSearch(website)
-    return WebsiteSearch(website)
+    return OnyxSearch(website)
 
 
 async def stop_unclaimed_session(runner, visitor_connected, timeout=25):

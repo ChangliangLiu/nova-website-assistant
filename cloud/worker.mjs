@@ -1,6 +1,4 @@
 import sites from '../agent/knowledge/sites.json' with { type: 'json' };
-import {searchSite} from './site-knowledge.mjs';
-import {searchCloudflare} from './cloudflare-search.mjs';
 import {searchOnyx} from './onyx-search.mjs';
 const json=(body,status=200)=>Response.json(body,{status,headers:{'Cache-Control':'no-store'}});
 function siteFor(id,origin){const s=Object.hasOwn(sites,id)?sites[id]:null;return s?.allowedOrigins?.includes(origin)?s:null}
@@ -16,13 +14,13 @@ export async function handle(request,env){
  if(u.pathname==='/api/widget/config' && request.method==='GET'){
   const s=siteFor(u.searchParams.get('site'),u.searchParams.get('parentOrigin'));if(!s)return json({detail:'Website not registered.'},403);
   const phoneNumber=env.PHONE_SITE_ID===s.siteId&&/^\+[1-9]\d{7,14}$/.test(env.PHONE_NUMBER||'')?env.PHONE_NUMBER:null;
-  return json({name:s.name,documentCount:s.documents.length,ready:!!env.PCC_API_KEY,prompts:s.suggestions||[],phoneNumber,preconnect:s.preconnect===true});
+  return json({name:s.name,ready:!!env.PCC_API_KEY,prompts:s.suggestions||[],phoneNumber,preconnect:s.preconnect===true});
  }
  if(!['/api/widget/session','/api/widget/search'].includes(u.pathname)||request.method!=='POST')return env.ASSETS.fetch(request);
  if(request.headers.get('origin')!==u.origin)return json({detail:'Invalid origin'},403);
  let body;try{const raw=await request.text();if(raw.length>10000)return json({detail:'Request too large'},413);body=JSON.parse(raw)}catch{return json({detail:'Invalid request'},400)}
  const s=siteFor(body?.site,body?.parentOrigin);if(!s)return json({detail:'Website not registered.'},403);
- if(u.pathname.endsWith('/search')){try{return json(await (env.NOVA_SEARCH_PROVIDER==='onyx'?searchOnyx(body.query,s,env):env.NOVA_SEARCH_PROVIDER==='cloudflare'?searchCloudflare(body.query,s,env):searchSite(body.query,s)))}catch{return json({detail:'Search unavailable or invalid query.'},503)}}
+ if(u.pathname.endsWith('/search')){try{return json(await searchOnyx(body.query,s,env))}catch{return json({detail:'Search unavailable or invalid query.'},503)}}
  if(!env.PCC_API_KEY||!env.SESSION_IP_LIMITER||!env.SESSION_TOTAL_LIMITER)return json({detail:'Conversation service unavailable.'},503);
  const ip=request.headers.get('cf-connecting-ip');if(!ip)return json({detail:'Conversation service unavailable.'},503);
  const [a,b]=await Promise.all([env.SESSION_IP_LIMITER.limit({key:ip}),env.SESSION_TOTAL_LIMITER.limit({key:'sessions'})]);if(!a.success||!b.success)return json({detail:'Too many conversations. Try again shortly.'},429);

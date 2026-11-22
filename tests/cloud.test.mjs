@@ -26,37 +26,12 @@ test('phone option is published only for its configured site and valid number',a
  const invalid=await (await handle(config,{...env,PHONE_SITE_ID:'alpine',PHONE_NUMBER:'not a phone number'})).json();
  assert.equal(invalid.phoneNumber,null);
 });
-test('pre-conversation search uses the registered website snapshot by default',async()=>{
- const request=new Request(url+'/api/widget/search',{method:'POST',headers:{origin:url},body:JSON.stringify({...site,query:'return policy'})});
- const response=await handle(request,env);assert.equal(response.status,200);
- const result=await response.json();assert.equal(result.provider,'website');
- assert.ok(result.sources.some(s=>s.url.includes('/guides/returns/')));
-});
-
-test('Cloudflare search uses server-configured instance and returns document content',async()=>{
- const {searchCloudflare}=await import('../cloud/cloudflare-search.mjs');
- const previous=globalThis.fetch;let seen;
- globalThis.fetch=async (url,options)=>{seen={url,options};return Response.json({success:true,result:{chunks:[{text:'A useful passage',item:{key:'guide.pdf'}}]}})};
- try{let env={CF_ACCOUNT_ID:'a'.repeat(32),CF_AI_SEARCH_NAMESPACE:'default',CF_AI_SEARCH_INSTANCE:'shop',CF_AI_SEARCH_TOKEN:'private-token'};let result=await searchCloudflare('question',{siteId:'alpine'},env);assert.match(seen.url,/instances\/shop\/search$/);assert.equal(result.passages[0].content,'A useful passage');assert.equal(result.sources.length,0);assert.equal(JSON.stringify(result).includes('private-token'),false)}finally{globalThis.fetch=previous}
-});
-
-test('widget search uses Cloudflare when configured',async()=>{
- const original=globalThis.fetch;
- globalThis.fetch=async()=>Response.json({success:true,result:{chunks:[{text:'Cloudflare guide',item:{key:'guide.pdf'}}]}});
- try{
-  const request=new Request(url+'/api/widget/search',{method:'POST',headers:{origin:url},body:JSON.stringify({...site,query:'guide'})});
-  const config={...env,NOVA_SEARCH_PROVIDER:'cloudflare',CF_ACCOUNT_ID:'a'.repeat(32),CF_AI_SEARCH_NAMESPACE:'default',CF_AI_SEARCH_INSTANCE:'shop',CF_AI_SEARCH_TOKEN:'private-token'};
-  const response=await handle(request,config);assert.equal(response.status,200);
-  const result=await response.json();assert.equal(result.provider,'cloudflare');assert.equal(result.passages[0].content,'Cloudflare guide');
- }finally{globalThis.fetch=original}
-});
-
 test('Onyx search enforces the configured document set and preserves safe sources',async()=>{
  const original=globalThis.fetch;let body;
  globalThis.fetch=async(url,opts)=>{assert.equal(url.pathname,'/api/search/send-search-message');body=JSON.parse(opts.body);return Response.json({search_docs:[{semantic_identifier:'Returns',content:'Return within 30 days.',link:'https://shop.example/returns'},{semantic_identifier:'Bad',content:'Example',link:'javascript:alert(1)'}],error:null})};
  try{
   const request=new Request(url+'/api/widget/search',{method:'POST',headers:{origin:url},body:JSON.stringify({...site,query:'return policy',document_set:'private'})});
-  const response=await handle(request,{...env,NOVA_SEARCH_PROVIDER:'onyx',ONYX_API_KEY:'private-token',ONYX_DOCUMENT_SET:'Alpine Public'});
+  const response=await handle(request,{...env,ONYX_API_KEY:'private-token',ONYX_DOCUMENT_SET:'Alpine Public'});
   assert.equal(response.status,200);const result=await response.json();
   assert.deepEqual(body.filters,{document_set:['Alpine Public']});assert.equal(result.provider,'onyx');
   assert.equal(result.sources[0].url,'https://shop.example/returns');assert.equal(result.passages[1].url,'');
@@ -66,6 +41,6 @@ test('Onyx search enforces the configured document set and preserves safe source
 
 test('Onyx search fails closed without a configured document set',async()=>{
  const request=new Request(url+'/api/widget/search',{method:'POST',headers:{origin:url},body:JSON.stringify({...site,query:'return policy'})});
- const response=await handle(request,{...env,NOVA_SEARCH_PROVIDER:'onyx',ONYX_API_KEY:'private-token'});
+ const response=await handle(request,{...env,ONYX_API_KEY:'private-token'});
  assert.equal(response.status,503);
 });

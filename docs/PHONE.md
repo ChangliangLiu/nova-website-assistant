@@ -22,7 +22,7 @@ pipecat cloud deploy --config-file pcc-phone.toml --dockerfile Dockerfile.phone 
 pipecat cloud agent deployments YOUR_PHONE_AGENT_NAME
 ```
 
-The example uses zero warm agents and one concurrent session. A cold start can delay the initial greeting; larger limits may incur greater usage. The agent enforces a ten-minute session timeout. Update and redeploy the phone agent when changing the website snapshot.
+The example uses zero warm agents and one concurrent session. A cold start can delay the initial greeting; larger limits may incur greater usage. The agent enforces a ten-minute session timeout. Update and redeploy the phone agent when changing the site registration or its server-side settings. Keep its Onyx document set current.
 
 ## Connect a Daily phone number
 

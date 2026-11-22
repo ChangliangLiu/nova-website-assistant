@@ -4,7 +4,7 @@ This guide walks through a local Alpine Outfitters demo and deployment to your o
 
 ## 1. Prerequisites and repositories
 
-Install Git, Node.js 22 or newer, Python 3.11 or 3.12, and a working C compiler. Create accounts with Zoom AI Services, Simli, Pipecat Cloud and Cloudflare. Cloud deployment and provider sessions may incur charges.
+Install Git, Node.js 22 or newer, Python 3.11 or 3.12, and a working C compiler. Create accounts with Zoom AI Services, Simli, Onyx, Pipecat Cloud and Cloudflare. Cloud deployment and provider sessions may incur charges.
 
 ```sh
 git clone https://github.com/ChangliangLiu/nova-website-assistant.git
@@ -44,7 +44,17 @@ pipecat cloud auth login
 
 For cloud deployment you will also create an organization **public API key** for the server-side session gateway. Despite its name, treat it as a secret because it can start billable sessions. It is separate from the Zoom and Simli keys and from your CLI login.
 
-**Cloudflare.** Create a Cloudflare account. Authenticate Wrangler when ready to deploy, using `npx wrangler login`. A Cloudflare AI Search API token is only needed for the optional indexed search setup below; it is not needed for the initial local snapshot demo.
+**Onyx.** Create an Onyx account or self-host Onyx. Connect the website and public documents, place them in a document set, and wait for indexing to finish. Create an API key allowed to search that set; grant only appropriate access. Every document in the set must be suitable for visitors. See [Onyx connectors](https://docs.onyx.app/overview/core_features/connectors) and the [Onyx API reference](https://cloud.onyx.app/api/docs).
+
+Add these values to `.env` before running the agent. The search endpoint records queries in the service account's search history; Nova may search a final transcript before the voice agent decides whether it needs a search.
+
+```dotenv
+ONYX_URL=https://cloud.onyx.app
+ONYX_DOCUMENT_SET=your-public-document-set
+ONYX_API_KEY=your-api-key
+```
+
+**Cloudflare.** Create a Cloudflare account. Authenticate Wrangler when ready to deploy, using `npx wrangler login`. Cloudflare hosts the gateway and website.
 
 ## 3. Build and run both projects locally
 
@@ -59,7 +69,7 @@ npm run dev
 
 The website is at http://127.0.0.1:4173 and loads its assistant from http://127.0.0.1:8000 by default. The build also exports `dist/assistant-content.json` from the same product and guide content used for the pages.
 
-In the assistant terminal import the website content and start the local agent:
+In the assistant terminal register the website and start the local agent. The feed supplies site metadata and permitted origins; it does not index content into Onyx:
 
 ```sh
 node scripts/import-site.mjs ../alpine-outfitters-demo/dist/assistant-content.json http://127.0.0.1:4173,http://127.0.0.1:8000
@@ -95,11 +105,11 @@ cd ../nova-website-assistant
 node scripts/import-site.mjs ../alpine-outfitters-demo/dist/assistant-content.json https://YOUR-PROJECT.pages.dev,http://127.0.0.1:4173,http://127.0.0.1:8000
 ```
 
-The feed has a site ID, name, origin, descriptions and published documents. Import accepts 1–100 documents, each up to 15,000 characters, and a feed up to 180,000 characters. Document URLs must use the feed's origin. Allowed embedding origins must be exact HTTPS origins (HTTP is allowed on localhost). Importing a feed updates the checked-in `agent/knowledge/sites.json` locally; do not commit private content. This small snapshot does not crawl or automatically update.
+The feed provides a site ID, name, origin, descriptions and documents. The importer validates the feed and stores only site metadata and allowed origins in `agent/knowledge/sites.json`; it does not upload or index the documents. Allowed embedding origins must be exact HTTPS origins (HTTP is allowed on localhost). Connect the website and public documents in Onyx separately, and verify indexing is complete.
 
 The Alpine example sets `preconnect: true` in its site entry. When a visitor opens the widget, this prepares a short-lived cloud session so the avatar can connect sooner. Microphone access still begins only when the visitor presses Connect. An unused preparation expires after 20 seconds and the agent stops an unclaimed session after 25 seconds; prepared sessions can incur provider charges. Omit the field or set it to `false` to start a cloud session only after the visitor presses Connect.
 
-To reduce search latency, a final spoken transcript may be sent to the configured search provider before the voice agent decides whether to search. A result is reused only when its meaningful terms match the agent's search query; context-dependent follow-ups get their own search.
+To reduce search latency, a final spoken transcript may be sent to Onyx before the voice agent decides whether to search. A result is reused only when its meaningful terms match the agent's search query; context-dependent follow-ups get their own search.
 
 For spoken answers, Nova initially gives Zoom up to three retrieved passages and uses the low reasoning setting to shorten response time. If those passages are insufficient, Nova can request the remaining results from the same search. The widget displays links for the passages provided to the agent. Response time and retrieval quality vary by question and provider; test your own content and multi-part questions.
 
@@ -118,7 +128,7 @@ Follow the CLI's prompts and confirm the deployment is ready. The `Dockerfile` a
 
 ## 6. Deploy the widget gateway and website to Cloudflare
 
-In `cloud/wrangler.json`, choose a unique Worker `name`, set `vars.PCC_AGENT_NAME` to the Pipecat agent name chosen above, and choose rate-limit namespace IDs appropriate to your account. For example, add `"vars": {"PCC_AGENT_NAME": "YOUR_AGENT_NAME"}` at the top level; keep the existing assets and rate-limit bindings. The Worker fails closed without those bindings.
+In `cloud/wrangler.json`, choose a unique Worker `name`, set `vars.PCC_AGENT_NAME` to the Pipecat agent name, and add `vars.ONYX_URL` and `vars.ONYX_DOCUMENT_SET` with the same values used by the agent. Choose rate-limit namespace IDs appropriate to your account and retain the existing assets and rate-limit bindings. The Worker fails closed without those bindings.
 
 Create a Pipecat Cloud public API key for session starts:
 
@@ -132,6 +142,7 @@ Copy the key securely when shown. Deploy the Worker, then enter the key at Wrang
 npm run build
 npx wrangler deploy --config cloud/wrangler.json --keep-vars
 npx wrangler secret put PCC_API_KEY --config cloud/wrangler.json
+npx wrangler secret put ONYX_API_KEY --config cloud/wrangler.json
 ```
 
 Use the HTTPS Worker origin printed by Wrangler as the assistant origin. From the website repository, build and upload the final site:
@@ -146,7 +157,7 @@ Open the Pages URL and repeat the real conversation tests. The Worker serves the
 
 ## 7. Adapt the assistant for another website
 
-Generate a feed like the Alpine `dist/assistant-content.json` with your own site ID, canonical origin, and public documents. Import it with your site's exact allowed origins, and rebuild/redeploy **both** the agent and Worker whenever the snapshot or allowed origins change. The website only needs this script in its shared HTML template:
+Generate a feed like the Alpine `dist/assistant-content.json` with your own site ID, canonical origin, and public documents. Import it with your site's exact allowed origins, and rebuild/redeploy **both** the agent and Worker when site metadata or allowed origins change. Connect and index the website and public documents in the Onyx document set separately. The website only needs this script in its shared HTML template:
 
 ```html
 <script src="https://YOUR-WORKER.workers.dev/widget.js"
@@ -155,57 +166,6 @@ Generate a feed like the Alpine `dist/assistant-content.json` with your own site
 
 The site ID must match the imported feed. For a restrictive Content Security Policy, allow the assistant origin for scripts and frames; ensure the iframe can request microphone access. `window.AvatarAssistant.open()`, `.ask(question)`, `.close()` and `.destroy()` are available after the script loads. `close()` minimizes the widget and may leave a live conversation active; `destroy()` disconnects it.
 
-### Optional: Cloudflare AI Search
-
-The default snapshot requires no indexing service. For a larger knowledge base, create an AI Search instance and add your public documents and website content using the [Cloudflare AI Search guide](https://developers.cloudflare.com/ai-search/get-started/). Check source support and indexing status in Cloudflare; do not assume every hosted website can be crawled automatically. Restrict the instance to content you intend to expose to visitors.
-
-Create an **account API token** in the Cloudflare dashboard:
-
-1. Sign in at the [Cloudflare dashboard](https://dash.cloudflare.com/), choose your account, and open **Manage account → Account API tokens** in the left sidebar. Select **Create Token**.
-2. On **Create a token**, replace the suggested **Token name** with a name such as `Nova AI Search`. Under **Permission policies**, select **Start from scratch**.
-3. In the **Edit policy** panel, leave **Entire Account** selected. Expand **AI & Machine Learning**, find the **AI Search** row, and check **Run** and **Edit** on that row. You do not need to add a second policy.
-4. Select **Review token**. The summary displays the selected permissions as **AI Search Run** and **AI Search Write**; **Write** is how the review screen labels the **Edit** choice. Select **Create token**, then copy and save the token value when it appears.
-
-Cloudflare may show only the permission groups allowed by your account role; ask an account administrator if AI Search is unavailable. See Cloudflare's [account API token documentation](https://developers.cloudflare.com/fundamentals/api/get-started/account-owned-tokens/) if the dashboard changes. Find the account ID and the instance name in the dashboard. Set these in the agent `.env` before starting locally or uploading the secret set:
-
-```dotenv
-NOVA_SEARCH_PROVIDER=cloudflare
-CF_ACCOUNT_ID=your-account-id
-CF_AI_SEARCH_NAMESPACE=default
-CF_AI_SEARCH_INSTANCE=your-instance-name
-CF_AI_SEARCH_TOKEN=your-api-token
-```
-
-For cloud use, add the nonsecret values `NOVA_SEARCH_PROVIDER`, `CF_ACCOUNT_ID`, `CF_AI_SEARCH_NAMESPACE`, and `CF_AI_SEARCH_INSTANCE` to `vars` in `cloud/wrangler.json`; set `CF_AI_SEARCH_TOKEN` as a Worker secret with `npx wrangler secret put CF_AI_SEARCH_TOKEN --config cloud/wrangler.json`. Upload the same settings to the Pipecat secret set, then redeploy the agent and Worker. Both use the same indexed knowledge. If the search service is unavailable, this mode fails closed rather than silently switching to the snapshot. Confirm that indexed content is searchable and relevant before testing a conversation.
-
-### Add a static website to AI Search
-
-Cloudflare can automatically crawl a website only when its domain is onboarded to the same Cloudflare account. The Alpine demo uses a `pages.dev` domain, so its built pages can instead be uploaded to the same AI Search instance as your other documents. From the assistant repository, after building the site with its production `SITE_ORIGIN`:
-
-```sh
-# Set CF_ACCOUNT_ID, CF_AI_SEARCH_NAMESPACE, CF_AI_SEARCH_INSTANCE and
-# CF_AI_SEARCH_TOKEN in .env first; see the AI Search section above.
-.venv/bin/python scripts/sync-static-site.py --root ../alpine-outfitters-demo/dist --dry-run
-.venv/bin/python scripts/sync-static-site.py --root ../alpine-outfitters-demo/dist
-```
-
-The command reads the site's sitemap and local HTML, uploads each page's main content and source URL, and leaves other uploaded documents intact. Cloudflare indexes uploads asynchronously. Re-run the command after each website deployment; it updates the same page items but does not automatically remove pages deleted from the sitemap. If you later connect a custom domain to Cloudflare, you can use [Cloudflare's automatic website crawler](https://developers.cloudflare.com/ai-search/configuration/data-source/website/) instead.
-
-### Optional: Onyx search
-
-Onyx can index website content and uploaded documents, including content from supported connected sources. Create an Onyx account or self-host Onyx, connect your public website and documents, and group the content the assistant may share into a dedicated document set. Check that its indexing has completed. The assistant sends visitor questions to Onyx, and this search endpoint records them in the service account's search history. Final spoken transcripts may be searched before the voice agent decides whether it needs a search.
-
-Create an Onyx API key with access to the document set. The key's permissions can be broader than the document-set filter, so grant it only the access appropriate for your deployment and keep it on the server. Every document in the selected set must be appropriate for public visitors. See [Onyx connectors](https://docs.onyx.app/overview/core_features/connectors) and the [Onyx API reference](https://cloud.onyx.app/api/docs).
-
-```dotenv
-NOVA_SEARCH_PROVIDER=onyx
-ONYX_URL=https://cloud.onyx.app
-ONYX_DOCUMENT_SET=your-public-document-set
-ONYX_API_KEY=your-api-key
-```
-
-Set these values in the agent `.env` for local use. For cloud use, add `NOVA_SEARCH_PROVIDER`, `ONYX_URL`, and `ONYX_DOCUMENT_SET` to the Worker's nonsecret `vars` in `cloud/wrangler.json`, and upload the key as `ONYX_API_KEY` with `npx wrangler secret put ONYX_API_KEY --config cloud/wrangler.json`. Upload the same settings to the Pipecat secret set, then redeploy the agent and Worker. The application requires a configured document set and fails closed if Onyx is unavailable. It uses Onyx's fast search endpoint with query expansion disabled, and never accepts a document-set override from a visitor.
-
 ## 8. Troubleshooting
 
 | Symptom | What to check |
@@ -213,7 +173,7 @@ Set these values in the agent `.env` for local use. For cloud use, add `NOVA_SEA
 | Widget does not load | Assistant URL, imported allowed origin, website CSP and microphone permissions. |
 | Connection stalls | Local server or cloud deployment, provider billing, the session key, matching agent name and agent logs. Cloud agents can cold-start. |
 | No voice or avatar | Zoom key and Voice Agent access, Simli key and face ID, microphone permission and provider logs. |
-| Answers are missing or stale | Feed origin and content; re-import and redeploy both services. For indexed search, check the instance, token and indexing status. |
+| Answers are missing or stale | Check the Onyx URL, document set, API key permissions, connectors and indexing status. Confirm the content is in the selected document set. |
 | No source links | Ensure search results include public source URLs; some indexed document results may not have them. |
 
 The optional audio-only phone channel has its own [setup guide](PHONE.md).

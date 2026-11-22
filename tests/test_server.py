@@ -12,33 +12,38 @@ SITE = {'site':'alpine', 'parentOrigin':'http://localhost:8000'}
 def test_site_config_and_origin_isolation():
     response = client.get('/api/widget/config', params=SITE)
     assert response.status_code == 200
-    assert response.json()['documentCount'] == 29
+    assert response.json()['name'] == 'Alpine Outfitters'
     assert client.get('/api/widget/config', params={**SITE, 'parentOrigin':'https://evil.example'}).status_code == 403
     response = client.get('/embed', params=SITE)
     assert response.status_code == 200
     assert "frame-ancestors 'self'" in response.headers['content-security-policy']
 
-def test_offline_search_and_foreign_origin():
-    data = {**SITE, 'query':'return policy'}
-    response = client.post('/api/widget/search', headers={'origin':'http://testserver'}, json=data)
+def test_search_uses_onyx_and_rejects_foreign_origin(monkeypatch):
+    monkeypatch.setenv('ONYX_API_KEY', 'test-key')
+    monkeypatch.setenv('ONYX_DOCUMENT_SET', 'public')
+    search = type('Search', (), {})()
+    search.search = AsyncMock(return_value={'provider': 'onyx', 'sources': [{'url': 'https://example.com/returns'}]})
+    search.aclose = AsyncMock()
+    monkeypatch.setattr(server, 'make_search', lambda site: search)
+    data = {**SITE, 'query': 'return policy'}
+    response = client.post('/api/widget/search', headers={'origin': 'http://testserver'}, json=data)
     assert response.status_code == 200
-    assert any('/guides/returns/' in s['url'] for s in response.json()['sources'])
-    assert client.post('/api/widget/search', headers={'origin':'https://evil.example'}, json=data).status_code == 403
+    assert response.json()['provider'] == 'onyx'
+    assert client.post('/api/widget/search', headers={'origin': 'https://evil.example'}, json=data).status_code == 403
 
-def test_search_provider_selection(monkeypatch):
-    website = server.get_site('alpine', 'http://localhost:8000')
+
+def test_search_always_uses_onyx(monkeypatch):
     monkeypatch.delenv('NOVA_SEARCH_PROVIDER', raising=False)
-    assert isinstance(server.make_search(website), server.WebsiteSearch)
-    monkeypatch.setenv('NOVA_SEARCH_PROVIDER', 'cloudflare')
-    assert isinstance(server.make_search(website), server.CloudflareSearch)
-
-
-def test_onyx_provider_selection(monkeypatch):
-    monkeypatch.setenv('NOVA_SEARCH_PROVIDER', 'onyx')
-    website = server.get_site('alpine', 'http://localhost:8000')
-    search = server.make_search(website)
+    search = server.make_search(server.get_site('alpine', 'http://localhost:8000'))
     assert isinstance(search, server.OnyxSearch)
     asyncio.run(search.aclose())
+
+
+def test_missing_onyx_configuration_does_not_use_website_content(monkeypatch):
+    monkeypatch.delenv('ONYX_API_KEY', raising=False)
+    response = client.post('/api/widget/search', headers={'origin': 'http://testserver'}, json={**SITE, 'query': 'return policy'})
+    assert response.status_code == 503
+    assert 'passages' not in response.json()
 
 def test_missing_keys_fail_before_offer(monkeypatch):
     for name in ('ZOOM_AI_API_KEY', 'SIMLI_API_KEY', 'SIMLI_FACE_ID'):
