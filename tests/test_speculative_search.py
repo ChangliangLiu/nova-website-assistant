@@ -67,3 +67,42 @@ def test_failed_prefetch_retries_the_real_search():
         assert provider.search.await_count == 2
         await s.aclose()
     asyncio.run(run())
+
+
+def test_expansion_reuses_result_and_new_turn_clears_cache():
+    async def run():
+        provider = type('Provider', (), {})()
+        provider.search = AsyncMock(side_effect=lambda query: {'query': query})
+        provider.aclose = AsyncMock()
+        s = SpeculativeSearch(provider)
+        assert await s.resolve('return policy') == await s.resolve('return policy')
+        assert provider.search.await_count == 1
+        s.start('ski boots')
+        await s.resolve('return policy')
+        assert provider.search.await_count >= 2
+        await s.aclose()
+    asyncio.run(run())
+
+
+def test_old_inflight_result_cannot_fill_new_turn_cache():
+    async def run():
+        release = asyncio.Event()
+        started = asyncio.Event()
+        async def search(query):
+            if query == 'return policy':
+                started.set()
+                await release.wait()
+            return {'query': query}
+        provider = type('Provider', (), {})()
+        provider.search = AsyncMock(side_effect=search)
+        provider.aclose = AsyncMock()
+        s = SpeculativeSearch(provider)
+        pending = asyncio.create_task(s.resolve('return policy'))
+        await started.wait()
+        s.start('ski boots')
+        release.set()
+        await pending
+        await s.resolve('return policy')
+        assert sum(call.args[0] == 'return policy' for call in provider.search.await_args_list) == 2
+        await s.aclose()
+    asyncio.run(run())

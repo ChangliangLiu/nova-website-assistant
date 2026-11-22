@@ -101,6 +101,8 @@ The Alpine example sets `preconnect: true` in its site entry. When a visitor ope
 
 To reduce search latency, a final spoken transcript may be sent to the configured search provider before the voice agent decides whether to search. A result is reused only when its meaningful terms match the agent's search query; context-dependent follow-ups get their own search.
 
+For spoken answers, Nova initially gives Zoom up to three retrieved passages and uses the low reasoning setting to shorten response time. If those passages are insufficient, Nova can request the remaining results from the same search. The widget displays links for the passages provided to the agent. Response time and retrieval quality vary by question and provider; test your own content and multi-part questions.
+
 ## 5. Deploy the Python agent to Pipecat Cloud
 
 Edit `pcc-deploy.toml` and choose your own unique `agent_name`, `secret_set`, region and scaling. The sample names belong to a demo: do not reuse them. The demo keeps two `agent-3x` instances warm to reduce connection delays; they incur charges even when idle. Choose a smaller profile or set `min_agents` to zero to reduce idle usage, understanding that a cold start can take longer. With your virtual environment active, upload the `.env` provider settings to the named secret set and build/deploy the agent:

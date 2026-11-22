@@ -31,6 +31,7 @@ from cloudflare_search import CloudflareSearch
 from onyx_search import OnyxSearch
 from video_throttle import VIDEO_FPS, VIDEO_SIZE, VideoThrottle
 from speculative_search import SpeculativeSearch
+from search_context import select_search_context
 
 BASE = Path(__file__).resolve().parent.parent
 load_dotenv(BASE / '.env')
@@ -117,11 +118,12 @@ async def run_pipeline(transport, website, page_url, *, phone=False):
     speculative_search = SpeculativeSearch(search)
     worker = None
 
-    async def search_website(params: FunctionCallParams, query: str):
+    async def search_website(params: FunctionCallParams, query: str, include_more_results: bool = False):
         """Search the registered website for relevant passages and source links.
 
         Args:
             query: The visitor's question or search terms.
+            include_more_results: Request all available passages if the initial results do not contain the answer.
         """
         try:
             result = await speculative_search.resolve(query)
@@ -129,20 +131,22 @@ async def run_pipeline(transport, website, page_url, *, phone=False):
             await params.result_callback({'error': 'Website search is unavailable.'})
             return
 
+        context, sources = select_search_context(result, include_more_results)
         async def publish_sources():
             if not phone:
                 try:
-                    await worker.rtvi.send_server_message({'type': 'sources', 'sources': result['sources']})
+                    await worker.rtvi.send_server_message({'type': 'sources', 'sources': sources})
                 except Exception:
                     # A UI delivery failure should not prevent the spoken answer.
                     pass
 
-        await asyncio.gather(params.result_callback({'passages': result['passages']}), publish_sources())
+        await asyncio.gather(params.result_callback(context), publish_sources())
 
     llm = ZoomAIRealtimeLLMService(api_key=os.environ['ZOOM_AI_API_KEY'],
         settings=ZoomAIRealtimeLLMService.Settings(
             system_instruction=website_instructions(website, page_url, phone=phone),
-            speak=Speak(voice=os.getenv('ZOOM_VOICE', 'jenna'))))
+            speak=Speak(voice=os.getenv('ZOOM_VOICE', 'jenna')),
+            extra={'think': {'reasoning': {'effort': 'low'}}}))
     avatar = None if phone else SimliVideoService(api_key=os.environ['SIMLI_API_KEY'],
         face_id=os.environ['SIMLI_FACE_ID'], max_session_length=600, max_idle_time=120)
     context = LLMContext([{'role': 'developer', 'content': 'Greet the visitor briefly as Nova and ask how you can help.'}], [search_website])

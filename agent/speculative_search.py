@@ -15,10 +15,16 @@ class SpeculativeSearch:
         self.search = search
         self._terms = ()
         self._task = None
+        self._last_terms = None
+        self._last_result = None
+        self._generation = 0
         warm_connection = getattr(search, 'warm_connection', None)
         self._warmup = asyncio.create_task(warm_connection()) if warm_connection else None
 
     def start(self, transcript):
+        self._generation += 1
+        self._last_terms = None
+        self._last_result = None
         if not isinstance(transcript, str) or not 1 <= len(transcript.strip()) <= 2048:
             return
         terms = _terms(transcript)
@@ -38,17 +44,27 @@ class SpeculativeSearch:
             task.exception()
 
     async def resolve(self, query):
+        generation = self._generation
+        terms = _terms(query)
+        if self._last_terms == terms and self._last_result is not None:
+            return self._last_result
         # A rewritten or context-resolved query may mean something different.
         # Only share the result when the meaningful terms match exactly.
-        if self._task and _terms(query) == self._terms:
+        if self._task and terms == self._terms:
             try:
                 logger.info('Reusing early knowledge retrieval')
-                return await asyncio.shield(self._task)
+                result = await asyncio.shield(self._task)
+                if generation == self._generation:
+                    self._last_terms, self._last_result = terms, result
+                return result
             except Exception:
                 # A failed early attempt must not prevent the actual tool call.
                 pass
         logger.info('Starting knowledge retrieval for tool query')
-        return await self.search.search(query)
+        result = await self.search.search(query)
+        if generation == self._generation:
+            self._last_terms, self._last_result = terms, result
+        return result
 
     async def aclose(self):
         if self._warmup and not self._warmup.done():
