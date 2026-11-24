@@ -24,7 +24,7 @@ export async function handle(request,env){
  if(!env.PCC_API_KEY||!env.SESSION_IP_LIMITER||!env.SESSION_TOTAL_LIMITER)return json({detail:'Conversation service unavailable.'},503);
  const ip=request.headers.get('cf-connecting-ip');if(!ip)return json({detail:'Conversation service unavailable.'},503);
  const [a,b]=await Promise.all([env.SESSION_IP_LIMITER.limit({key:ip}),env.SESSION_TOTAL_LIMITER.limit({key:'sessions'})]);if(!a.success||!b.success)return json({detail:'Too many conversations. Try again shortly.'},429);
- let page='';try{if(new URL(body.pageUrl).origin===s.origin)page=body.pageUrl.slice(0,2048)}catch{}
+ let page='';try{if(new URL(body.pageUrl).origin===body.parentOrigin)page=body.pageUrl.slice(0,2048)}catch{}
  let response;try{response=await fetch('https://api.pipecat.daily.co/v1/public/'+encodeURIComponent(env.PCC_AGENT_NAME||'nova-website-assistant')+'/start',{method:'POST',headers:{'Authorization':'Bearer '+env.PCC_API_KEY,'Content-Type':'application/json'},body:JSON.stringify({createDailyRoom:true,body:{site:s.siteId,parentOrigin:body.parentOrigin,pageUrl:page}}),signal:AbortSignal.timeout(30000)})}catch{return json({detail:'Could not reach Pipecat Cloud.'},502)}
  if(!response.ok)return json({detail:'Could not start the Pipecat conversation. Please try again.'},502);
  const data=await response.json();if(!data.dailyRoom||!data.dailyToken)return json({detail:'Pipecat returned incomplete session details.'},502);

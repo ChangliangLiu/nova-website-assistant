@@ -207,7 +207,7 @@ async def offer(request: Request):
     if not all(os.getenv(k) for k in ('ZOOM_AI_API_KEY', 'SIMLI_API_KEY', 'SIMLI_FACE_ID')):
         raise HTTPException(503, 'Zoom Voice and Simli credentials must be configured on the server.')
     page = custom.get('pageUrl', '')
-    if not isinstance(page, str) or urlsplit(page).scheme + '://' + urlsplit(page).netloc != website['origin']:
+    if not isinstance(page, str) or urlsplit(page).scheme + '://' + urlsplit(page).netloc != custom.get('parentOrigin'):
         page = ''
     async def connected(connection):
         transport = SmallWebRTCTransport(webrtc_connection=connection, params=TransportParams(

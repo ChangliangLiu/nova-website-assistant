@@ -12,7 +12,7 @@ async def bot(args: DailyRunnerArguments):
     data = args.body if isinstance(args.body, dict) else {}
     site = get_site(data.get('site', ''), data.get('parentOrigin', ''))
     page = data.get('pageUrl', '')
-    if not isinstance(page, str) or urlsplit(page).scheme + '://' + urlsplit(page).netloc != site['origin']:
+    if not isinstance(page, str) or urlsplit(page).scheme + '://' + urlsplit(page).netloc != data.get('parentOrigin'):
         page = ''
     transport = DailyTransport(args.room_url, args.token, 'Nova', DailyParams(
         audio_in_enabled=True, audio_out_enabled=True, video_out_enabled=True,

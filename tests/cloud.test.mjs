@@ -16,6 +16,15 @@ test('session-start credentials stay server side',async()=>{
  const original=globalThis.fetch;globalThis.fetch=async(url,opts)=>{assert.match(opts.headers.Authorization,/^Bearer /);assert.equal(JSON.parse(opts.body).body.site,'alpine');return Response.json({dailyRoom:'https://example.daily.co/room',dailyToken:'visitor-token'})};
  try{const r=await handle(post(site),env);assert.equal(r.status,200);const v=await r.json();assert.equal(v.dailyToken,'visitor-token');assert.ok(!JSON.stringify(v).includes('test'))}finally{globalThis.fetch=original}
 });
+test('custom domain can start sessions and only passes its own page context',async()=>{
+ const original=globalThis.fetch;let forwarded;
+ globalThis.fetch=async(_url,opts)=>{forwarded=JSON.parse(opts.body).body;return Response.json({dailyRoom:'https://example.daily.co/room',dailyToken:'visitor-token'})};
+ try{
+  const custom={site:'alpine',parentOrigin:'https://sayhinova.com',pageUrl:'https://sayhinova.com/guide'};
+  assert.equal((await handle(post(custom),env)).status,200);assert.equal(forwarded.pageUrl,custom.pageUrl);
+  await handle(post({...custom,pageUrl:'https://evil.example/guide'}),env);assert.equal(forwarded.pageUrl,'');
+ }finally{globalThis.fetch=original}
+});
 test('phone option is published only for its configured site and valid number',async()=>{
  const config=new Request(url+'/api/widget/config?'+new URLSearchParams(site));
  const number='+14255550100';

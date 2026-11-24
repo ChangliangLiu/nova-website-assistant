@@ -13,6 +13,7 @@
     "description": "Fictional ski equipment shop. All products, prices, policies and specifications are demo content. No real orders. No live mountain conditions.",
     "updatedAt": "2026-11-03",
     "allowedOrigins": [
+      "https://sayhinova.com",
       "https://alpine-outfitters-demo.pages.dev",
       "http://127.0.0.1:8000",
       "http://localhost:8000"
